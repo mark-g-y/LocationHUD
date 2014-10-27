@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/activity_hud_layout"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/camera_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/direction_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello world!"
+        android:textColor="@android:color/black"
+        android:layout_marginLeft="50px"
+        android:layout_marginTop="250px"
+        android:layout_gravity="left|top"/>
+
+    <TextView
+        android:id="@+id/bearing_sf_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello world!"
+        android:textColor="@android:color/black"
+        android:layout_marginLeft="50px"
+        android:layout_marginTop="350px"
+        android:layout_gravity="left|top"/>
+</RelativeLayout>
