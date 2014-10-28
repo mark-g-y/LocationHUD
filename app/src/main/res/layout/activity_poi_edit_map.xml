@@ -18,7 +18,7 @@
         android:layout_marginRight="15dp"
         android:layout_alignParentTop="true"
         android:orientation="horizontal"
-        android:background="@color/white_translucent"
+        android:background="@color/white_darker_translucent"
         >
         <TextView
             android:id="@+id/prompt_to_select_poi"
@@ -33,6 +33,7 @@
             android:id="@+id/navigation_arrow_forward"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
             android:src="@drawable/ic_navigation_arrow_forward"/>
     </LinearLayout>
 

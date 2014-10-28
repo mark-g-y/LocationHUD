@@ -11,6 +11,7 @@ import android.view.Display;
 import android.view.Surface;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -54,6 +55,14 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
             poiLayouts.put(poi.get(i), poiLayout);
             layoutHudActivity.addView(poiLayout);
         }
+
+        ImageButton navigationArrowBackButton = (ImageButton)findViewById(R.id.navigation_arrow_back);
+        navigationArrowBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override
@@ -147,14 +156,10 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
 
     @Override
     public void onCompassDirectionFound(final double azimuth) {
-        TextView tv = (TextView)findViewById(R.id.direction_view);
-        displayText(tv, "Dir - " + azimuth);
         Location location = compassDirectionManager.getLastLocation();
         if (location != null) {
             for (int i = 0; i < poi.size(); i++) {
                 double bearing = CompassDirectionManager.getAngleBetweenCoordinates(location.getLatitude(), location.getLongitude(), poi.get(i).getLatitude(), poi.get(i).getLongitude());
-                TextView bearingTextView = (TextView)findViewById(R.id.bearing_sf_view);
-                displayText(bearingTextView, "" + bearing);
                 if (isPoiInView(azimuth, bearing, poi.get(i))) {
                     positionPoi(poi.get(i), azimuth, bearing, compassDirectionManager.getTiltAngle(), CompassDirectionManager.getAngleBetweenAltitudes(location, poi.get(i)));
                 } else {
@@ -174,7 +179,6 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         double verticalLength = (height / 2) / Math.tan(Math.toRadians(verticalViewAngle / 2));
         final double horizontalWidth = Math.tan(Math.toRadians(horizontalDiff)) * horizontalLength;
         final double verticalWidth = Math.tan(Math.toRadians(verticalDiff)) * verticalLength;
-        //final TextView bearingTextView = (TextView)findViewById(R.id.bearing_sf_view);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

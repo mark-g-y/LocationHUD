@@ -34,14 +34,12 @@ public class ConfirmSelectedLocationDialog extends DialogFragment {
 
     public void initiate(LatLng location, String name) {
         this.selectedLocation = location;
-        this.confirmSelectedLocationDialogCallback = confirmSelectedLocationDialogCallback;
         this.name = name;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.dialog_confirm_selected_location, container, false);
-        getDialog().setTitle("DialogFragment Tutorial");
 
         TextView messageTextView = (TextView)rootView.findViewById(R.id.confirmation_message);
         messageTextView.setText("Edit this point");
