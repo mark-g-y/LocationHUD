@@ -2,9 +2,12 @@ package com.locationhud;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.widget.ImageButton;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,17 +34,18 @@ import java.util.Iterator;
  */
 public class PoiEditMapActivity extends FragmentActivity implements MyLocationFoundCallback, ConfirmSelectedLocationDialogCallback {
 
+    private Activity myActivity;
     private MyLocationManager locationManager;
     private GoogleMap map;
     private HashMap<Marker, MapPoint> markerToPoiMap = new HashMap<Marker, MapPoint>();
     private Marker lastAddedMarker;
     private LatLng lastLongClickLocation;
-    private ConfirmSelectedLocationDialog confirmSelectedLocationDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_poi_edit_map);
+        myActivity = this;
 
         locationManager = new MyLocationManager(this, this);
         locationManager.onCreate();
@@ -76,6 +80,15 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         });
 
         addLocationsInCurrentListToMap();
+
+        ImageButton navigationArrowForwardButton = (ImageButton)findViewById(R.id.navigation_arrow_forward);
+        navigationArrowForwardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(myActivity, HudActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

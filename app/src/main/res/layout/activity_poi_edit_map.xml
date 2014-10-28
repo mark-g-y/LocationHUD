@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <!--<com.google.android.gms.maps.MapView-->
-              <!--android:id="@+id/map"-->
-              <!--android:layout_width="match_parent"-->
-              <!--android:layout_height="match_parent"-->
-        <!--/>-->
     <fragment
         android:id="@+id/map"
         android:layout_width="match_parent"
@@ -17,4 +11,29 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         />
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:background="@color/white_translucent"
+        >
+        <TextView
+            android:id="@+id/prompt_to_select_poi"
+            android:text="@string/prompt_to_select_poi"
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
+        <ImageButton
+            android:id="@+id/navigation_arrow_forward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_navigation_arrow_forward"/>
+    </LinearLayout>
+
+</RelativeLayout>
