@@ -60,7 +60,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLong) {
-                lastAddedMarker = map.addMarker(new MarkerOptions().position(latLong));
+                lastAddedMarker = map.addMarker(new MarkerOptions().position(latLong).draggable(true));
                 lastLongClickLocation = latLong;
                 displayEditMarkerDialog(lastAddedMarker, "", myActivity.getString(R.string.save), myActivity.getString(R.string.cancel));
             }
@@ -75,6 +75,18 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                     displayEditMarkerDialog(marker, name, myActivity.getString(R.string.save), myActivity.getString(R.string.delete));
                 }
                 return false;
+            }
+        });
+        map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+            }
+            @Override
+            public void onMarkerDrag(Marker marker) {
+            }
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                markerToPoiMap.get(marker).updateLocation(marker.getPosition().latitude, marker.getPosition().longitude);
             }
         });
 
@@ -154,7 +166,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         ArrayList<MapPoint> list = PoiManager.getList(PoiManager.getCurrentList());
         for (int i = 0; i < list.size(); i++) {
             MapPoint mp = list.get(i);
-            Marker marker = map.addMarker(new MarkerOptions().position(new LatLng(mp.getLatitude(), mp.getLongitude())));
+            Marker marker = map.addMarker(new MarkerOptions().position(new LatLng(mp.getLatitude(), mp.getLongitude())).draggable(true));
             markerToPoiMap.put(marker, mp);
         }
     }
