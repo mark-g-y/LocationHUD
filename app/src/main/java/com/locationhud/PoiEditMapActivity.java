@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -40,6 +41,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     private HashMap<Marker, MapPoint> markerToPoiMap = new HashMap<Marker, MapPoint>();
     private Marker lastAddedMarker;
     private LatLng lastLongClickLocation;
+    private boolean saveMapZoomState = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,19 +52,17 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         locationManager = new MyLocationManager(this, this);
         locationManager.onCreate();
 
-        final ConfirmSelectedLocationDialog dialog = new ConfirmSelectedLocationDialog();
-        dialog.initiate(this);
-
         SupportMapFragment mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
         map = mapFragment.getMap();
+
+        final ConfirmSelectedLocationDialogCallback callback = this;
 
         map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLong) {
                 lastAddedMarker = map.addMarker(new MarkerOptions().position(latLong));
                 lastLongClickLocation = latLong;
-                dialog.initiate(latLong, "");
-                dialog.show(getSupportFragmentManager(), "TAG");
+                displayEditMarkerDialog(lastAddedMarker, "", myActivity.getString(R.string.save), myActivity.getString(R.string.cancel));
             }
         });
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -72,13 +72,13 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                     String name = markerToPoiMap.get(marker).getTitle();
                     lastAddedMarker = marker;
                     lastLongClickLocation = marker.getPosition();
-                    dialog.initiate(marker.getPosition(), name);
-                    dialog.show(getSupportFragmentManager(), "TAG");
+                    displayEditMarkerDialog(marker, name, myActivity.getString(R.string.save), myActivity.getString(R.string.delete));
                 }
                 return false;
             }
         });
 
+        PoiManager.readLocationsFromFile(getApplicationContext());
         addLocationsInCurrentListToMap();
 
         ImageButton navigationArrowForwardButton = (ImageButton)findViewById(R.id.navigation_arrow_forward);
@@ -89,6 +89,12 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                 startActivity(intent);
             }
         });
+    }
+
+    private void displayEditMarkerDialog(Marker marker, String name, String yesButtonText, String noButtonText) {
+        ConfirmSelectedLocationDialog dialog = new ConfirmSelectedLocationDialog();
+        dialog.initiate(this, marker.getPosition(), name, yesButtonText, noButtonText);
+        dialog.show(getSupportFragmentManager(), marker.getPosition().toString());
     }
 
     @Override
@@ -117,14 +123,23 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     }
 
     @Override
-    public void onMyLocationFound(Location location) {
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locationManager.getLastLocation().getLatitude(), locationManager.getLastLocation().getLongitude()), 12));
+    public void onDestroy() {
+        super.onDestroy();
+        PoiManager.saveLocationsToFile(getApplicationContext());
     }
 
     @Override
+    public void onMyLocationFound(Location location) {
+        if (!saveMapZoomState) {
+            saveMapZoomState = true;
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locationManager.getLastLocation().getLatitude(), locationManager.getLastLocation().getLongitude()), 12));
+        }
+     }
+
+    @Override
     public void onCancel() {
-        lastAddedMarker.remove();
-        if (markerToPoiMap.get(lastAddedMarker) != null) {
+        if (markerToPoiMap.get(lastAddedMarker) == null) {
+            lastAddedMarker.remove();
             markerToPoiMap.remove(lastAddedMarker);
         }
     }

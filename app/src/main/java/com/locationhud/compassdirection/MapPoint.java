@@ -5,6 +5,12 @@ package com.locationhud.compassdirection;
  */
 public class MapPoint {
 
+    public static final String LIST_LABEL = "list";
+    public static final String TITLE_LABEL = "title";
+    public static final String LATITUDE_LABEL = "latitude";
+    public static final String LONGITUDE_LABEL = "longitude";
+    public static final String ALTITUDE_LABEL = "altitude";
+
     private String title;
     private double longitude;
     private double latitude;

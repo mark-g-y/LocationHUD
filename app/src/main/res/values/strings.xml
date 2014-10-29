@@ -5,5 +5,10 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="prompt_to_select_poi">Tap and hold to add/edit a Point of Interest!</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="dialog_confirm_selected_location_title">Edit this Point</string>
+
 
 </resources>

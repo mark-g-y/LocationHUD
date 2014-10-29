@@ -1,11 +1,13 @@
 package com.locationhud.map;
 
+import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -23,31 +25,33 @@ public class ConfirmSelectedLocationDialog extends DialogFragment {
     private DialogFragment thisFragment;
     private LatLng selectedLocation;
     private String name;
+    private String yesButtonText;
+    private String noButtonText;
+    private boolean yesSelected = false;
 
     public ConfirmSelectedLocationDialog() {
         thisFragment = this;
     }
 
-    public void initiate(ConfirmSelectedLocationDialogCallback confirmSelectedLocationDialogCallback) {
+    public void initiate(ConfirmSelectedLocationDialogCallback confirmSelectedLocationDialogCallback, LatLng location, String name, String yesButtonText, String noButtonText) {
         this.confirmSelectedLocationDialogCallback = confirmSelectedLocationDialogCallback;
-    }
-
-    public void initiate(LatLng location, String name) {
         this.selectedLocation = location;
         this.name = name;
+        this.yesButtonText = yesButtonText;
+        this.noButtonText = noButtonText;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.dialog_confirm_selected_location, container, false);
 
-        TextView messageTextView = (TextView)rootView.findViewById(R.id.confirmation_message);
-        messageTextView.setText("Edit this point");
+        getDialog().setTitle(getString(R.string.dialog_confirm_selected_location_title));
 
         EditText locationNameInput = (EditText)rootView.findViewById(R.id.location_name_input);
         locationNameInput.setText(name);
 
         Button noButton = (Button)rootView.findViewById(R.id.cancel_button);
+        noButton.setText(noButtonText);
         noButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -57,9 +61,11 @@ public class ConfirmSelectedLocationDialog extends DialogFragment {
         });
 
         Button yesButton = (Button)rootView.findViewById(R.id.confirm_button);
+        yesButton.setText(yesButtonText);
         yesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                yesSelected = true;
                 thisFragment.dismiss();
                 EditText locationNameInput = (EditText)rootView.findViewById(R.id.location_name_input);
                 confirmSelectedLocationDialogCallback.onYes(locationNameInput.getText().toString());
@@ -68,5 +74,13 @@ public class ConfirmSelectedLocationDialog extends DialogFragment {
 
         // Do something else
         return rootView;
+    }
+
+    @Override
+    public void onDismiss(final DialogInterface dialog) {
+        if (!yesSelected) {
+            confirmSelectedLocationDialogCallback.onCancel();
+        }
+        this.dismiss();
     }
 }
