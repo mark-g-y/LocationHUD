@@ -8,7 +8,10 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,6 +25,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.locationhud.compassdirection.MapPoint;
 import com.locationhud.compassdirection.MyLocationFoundCallback;
 import com.locationhud.compassdirection.MyLocationManager;
+import com.locationhud.googleapi.PlacesAutoCompleteAdapter;
 import com.locationhud.map.ConfirmSelectedLocationDialog;
 import com.locationhud.map.ConfirmSelectedLocationDialogCallback;
 
@@ -54,8 +58,6 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
 
         SupportMapFragment mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
         map = mapFragment.getMap();
-
-        final ConfirmSelectedLocationDialogCallback callback = this;
 
         map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
@@ -92,6 +94,16 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
 
         PoiManager.readLocationsFromFile(getApplicationContext());
         addLocationsInCurrentListToMap();
+
+        AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.prompt_to_select_poi);
+        autoCompView.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.places_autocomplete_list_item));
+        autoCompView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                String str = (String) adapterView.getItemAtPosition(position);
+                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         ImageButton navigationArrowForwardButton = (ImageButton)findViewById(R.id.navigation_arrow_forward);
         navigationArrowForwardButton.setOnClickListener(new View.OnClickListener() {
@@ -159,6 +171,9 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     @Override
     public void onYes(String data) {
         MapPoint mapPoint = new MapPoint(data, lastLongClickLocation.latitude, lastLongClickLocation.longitude);
+        if (markerToPoiMap.get(lastAddedMarker) == null) {
+            mapPoint.findAltitudeFromApi();
+        }
         markerToPoiMap.put(lastAddedMarker, mapPoint);
     }
 

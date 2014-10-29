@@ -1,9 +1,12 @@
 package com.locationhud.compassdirection;
 
+import com.locationhud.altituderetrieval.AltitudeFoundCallback;
+import com.locationhud.altituderetrieval.RetrieveAltitudeTask;
+
 /**
  * Created by Mark on 19/10/2014.
  */
-public class MapPoint {
+public class MapPoint implements AltitudeFoundCallback {
 
     public static final String LIST_LABEL = "list";
     public static final String TITLE_LABEL = "title";
@@ -48,5 +51,15 @@ public class MapPoint {
     public void updateLocation(double latitude, double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    public void findAltitudeFromApi() {
+        RetrieveAltitudeTask task = new RetrieveAltitudeTask(this, latitude, longitude);
+        task.execute();
+    }
+
+    @Override
+    public void onAltitudeFound(double altitude) {
+        this.altitude = altitude;
     }
 }
