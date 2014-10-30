@@ -11,25 +11,6 @@
             android:hint="Enter the name of this location"
             android:id="@+id/location_name_input"/>
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Delete"
-                android:layout_weight="1"
-                android:id="@+id/cancel_button"/>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Save"
-                android:layout_weight="1"
-                android:id="@+id/confirm_button"/>
-
-        </LinearLayout>
+    <include layout="@layout/view_dialog_button_row" />
 
 </LinearLayout>

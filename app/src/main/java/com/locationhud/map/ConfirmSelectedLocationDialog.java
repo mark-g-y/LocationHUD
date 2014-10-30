@@ -1,19 +1,15 @@
 package com.locationhud.map;
 
 import android.content.DialogInterface;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
-
 import com.locationhud.R;
 
 /**
@@ -81,6 +77,10 @@ public class ConfirmSelectedLocationDialog extends DialogFragment {
         if (!yesSelected) {
             confirmSelectedLocationDialogCallback.onCancel();
         }
-        this.dismiss();
+        try {
+            this.dismiss();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 }
