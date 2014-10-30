@@ -7,6 +7,7 @@ import android.hardware.Camera;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.View;
@@ -238,6 +239,12 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         if (bearing < rightViewLimit && bearing > leftViewLimit) {
             return true;
         }
+        // edge case where left view is less than 180 and right view is greater than (denoted by neg)
+        if (leftViewLimit > 0 && rightViewLimit < 0) {
+            bearing = bearing > 0 ? bearing : bearing + 360;
+            rightViewLimit = rightViewLimit + 360;
+            return bearing < rightViewLimit && bearing > leftViewLimit;
+        }
         return false;
     }
 
@@ -250,25 +257,6 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
 
     private boolean isPoiInView(double myDirection, double bearing, MapPoint poi) {
         return isPoiInHorizontalView(myDirection, bearing) && isPoiInVerticalView(compassDirectionManager.getLastLocation(), poi);
-    }
-
-    private void displayText(final TextView tv, final String text) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                tv.setVisibility(View.VISIBLE);
-                tv.setText(text);
-            }
-        });
-    }
-
-    private void hideText(final TextView tv) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                tv.setVisibility(View.GONE);
-            }
-        });
     }
 
     public static float convertDpToPixel(float dp, Context context){

@@ -26,12 +26,15 @@ public class PoiLayout extends LinearLayout {
         titleTextView.setText(poi.getTitle());
 
         TextView locationTextView = (TextView)findViewById(R.id.location_view);
-        locationTextView.setText(poi.getLatitude() + ", " + poi.getLongitude() + ", " + poi.getAltitude());
+        //locationTextView.setText(convertDoubleForDisplay(poi.getLatitude()) + ", " + convertDoubleForDisplay(poi.getLongitude()) + ", " + convertDoubleForDisplay(poi.getAltitude()));
+        locationTextView.setText(convertDoubleForDisplay(poi.getAltitude()) + "m");
     }
 
     public void updateDistanceToPoi(double distance) {
-        TextView titleTextView = (TextView) findViewById(R.id.title_view);
-        titleTextView.setText(poi.getTitle() + " | " + convertDistanceForDisplay(distance));
+        //TextView titleTextView = (TextView) findViewById(R.id.title_view);
+        //titleTextView.setText(poi.getTitle() + " | " + convertDistanceForDisplay(distance));
+        TextView locationTextView = (TextView)findViewById(R.id.location_view);
+        locationTextView.setText(convertDistanceForDisplay(distance) + " | " + convertDoubleForDisplay(poi.getAltitude()) + "m");
     }
 
     private String convertDistanceForDisplay(double distance) {
@@ -40,5 +43,13 @@ public class PoiLayout extends LinearLayout {
             return roundedDistance / 10 + "km";
         }
         return ((double)Math.round(distance * 10)) / 10 + "m";
+    }
+
+    private String convertDoubleForDisplay(double d) {
+        return convertDoubleForDisplay(d, 3);
+    }
+
+    private String convertDoubleForDisplay(double d, int numDecimals) {
+        return Double.toString(Math.round(Math.pow(10, numDecimals) * d) / Math.pow(10, numDecimals));
     }
 }

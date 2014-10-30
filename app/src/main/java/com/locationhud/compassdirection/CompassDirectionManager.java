@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -201,6 +202,10 @@ public class CompassDirectionManager implements GooglePlayServicesClient.Connect
         if (directionHistory.size() >= MAX_DIRECTION_HISTORY_SIZE) {
             azimuth = getRefinedAverage(directionHistory);
             directionHistory.clear();
+            if (azimuth > 180) {
+                azimuth = azimuth - 360;
+                //Log.d("FOO", "Bearing: " + azimuth);
+            }
             compassDirectionFoundCallback.onCompassDirectionFound(azimuth);
         }
     }
