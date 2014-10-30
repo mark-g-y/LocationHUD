@@ -1,23 +1,15 @@
 package com.locationhud;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.DisplayMetrics;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -25,7 +17,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.locationhud.compassdirection.MapPoint;
 import com.locationhud.compassdirection.MyLocationFoundCallback;
 import com.locationhud.compassdirection.MyLocationManager;
-import com.locationhud.googleapi.PlacesAutoCompleteAdapter;
 import com.locationhud.map.ConfirmSelectedLocationDialog;
 import com.locationhud.map.ConfirmSelectedLocationDialogCallback;
 
@@ -94,16 +85,6 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
 
         PoiManager.readLocationsFromFile(getApplicationContext());
         addLocationsInCurrentListToMap();
-
-        AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.prompt_to_select_poi);
-        autoCompView.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.places_autocomplete_list_item));
-        autoCompView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                String str = (String) adapterView.getItemAtPosition(position);
-                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
-            }
-        });
 
         ImageButton navigationArrowForwardButton = (ImageButton)findViewById(R.id.navigation_arrow_forward);
         navigationArrowForwardButton.setOnClickListener(new View.OnClickListener() {

@@ -20,9 +20,9 @@
         android:orientation="horizontal"
         android:background="@color/white_darker_translucent"
         >
-        <AutoCompleteTextView
+        <TextView
             android:id="@+id/prompt_to_select_poi"
-            android:hint="@string/prompt_to_select_poi"
+            android:text="@string/prompt_to_select_poi"
             android:textColor="@android:color/black"
             android:gravity="center"
             android:layout_width="match_parent"
