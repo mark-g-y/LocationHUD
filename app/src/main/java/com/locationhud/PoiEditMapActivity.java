@@ -144,9 +144,13 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     @Override
     public void onCancel() {
         if (markerToPoiMap.get(lastAddedMarker) == null) {
-            lastAddedMarker.remove();
-            markerToPoiMap.remove(lastAddedMarker);
+            removeLastAddedMarker();
         }
+    }
+
+    @Override
+    public void onDelete() {
+        removeLastAddedMarker();
     }
 
     @Override
@@ -156,6 +160,11 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
             mapPoint.findAltitudeFromApi();
         }
         markerToPoiMap.put(lastAddedMarker, mapPoint);
+    }
+
+    private void removeLastAddedMarker() {
+        lastAddedMarker.remove();
+        markerToPoiMap.remove(lastAddedMarker);
     }
 
     private void addLocationsInCurrentListToMap() {

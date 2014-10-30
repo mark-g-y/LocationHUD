@@ -52,7 +52,11 @@ public class ConfirmSelectedLocationDialog extends DialogFragment {
             @Override
             public void onClick(View view) {
                 thisFragment.dismiss();
-                confirmSelectedLocationDialogCallback.onCancel();
+                if (noButtonText.equals(getString(R.string.cancel))) {
+                    confirmSelectedLocationDialogCallback.onCancel();
+                } else if (noButtonText.equals(getString(R.string.delete))) {
+                    confirmSelectedLocationDialogCallback.onDelete();
+                }
             }
         });
 

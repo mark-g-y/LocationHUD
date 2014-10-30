@@ -5,5 +5,6 @@ package com.locationhud.map;
  */
 public interface ConfirmSelectedLocationDialogCallback {
     public void onCancel();
+    public void onDelete();
     public void onYes(String data);
 }
