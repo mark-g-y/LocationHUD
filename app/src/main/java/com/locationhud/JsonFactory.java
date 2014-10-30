@@ -1,6 +1,5 @@
 package com.locationhud;
 
-import android.location.Location;
 import android.util.Log;
 
 import com.locationhud.compassdirection.MapPoint;

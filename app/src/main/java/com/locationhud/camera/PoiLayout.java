@@ -6,10 +6,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.locationhud.R;
-import com.locationhud.compassdirection.CompassDirectionManager;
 import com.locationhud.compassdirection.MapPoint;
-
-import org.w3c.dom.Text;
 
 /**
  * Created by Mark on 21/10/2014.

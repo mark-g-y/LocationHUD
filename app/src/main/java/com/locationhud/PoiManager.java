@@ -4,23 +4,10 @@ import android.content.Context;
 
 import com.locationhud.compassdirection.MapPoint;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * Created by Mark on 23/10/2014.
