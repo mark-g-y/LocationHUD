@@ -7,7 +7,6 @@ import android.hardware.Camera;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.View;
@@ -22,6 +21,7 @@ import com.locationhud.camera.PoiLayout;
 import com.locationhud.compassdirection.CompassDirectionFoundCallback;
 import com.locationhud.compassdirection.CompassDirectionManager;
 import com.locationhud.compassdirection.MapPoint;
+import com.locationhud.ui.UiUtility;
 
 import java.util.ArrayList;
 import java.util.HashMap;

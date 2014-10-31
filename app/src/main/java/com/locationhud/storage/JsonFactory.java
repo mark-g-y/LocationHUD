@@ -1,4 +1,4 @@
-package com.locationhud;
+package com.locationhud.storage;
 
 import android.util.Log;
 

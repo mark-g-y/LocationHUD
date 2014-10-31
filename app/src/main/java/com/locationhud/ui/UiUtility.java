@@ -1,4 +1,4 @@
-package com.locationhud;
+package com.locationhud.ui;
 
 import android.view.MotionEvent;
 import android.view.View;

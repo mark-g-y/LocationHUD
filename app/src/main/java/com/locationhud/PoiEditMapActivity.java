@@ -6,10 +6,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,6 +26,8 @@ import com.locationhud.compassdirection.MyLocationFoundCallback;
 import com.locationhud.compassdirection.MyLocationManager;
 import com.locationhud.map.ConfirmSelectedLocationDialog;
 import com.locationhud.map.ConfirmSelectedLocationDialogCallback;
+import com.locationhud.ui.AnimationFactory;
+import com.locationhud.ui.UiUtility;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -213,7 +218,20 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     }
 
     private void hideInstructions() {
-        View instructionsView = findViewById(R.id.edit_poi_map_instructions);
-        instructionsView.setVisibility(View.GONE);
+        final View instructionsView = findViewById(R.id.edit_poi_map_instructions);
+        TranslateAnimation animationHide = AnimationFactory.buildTranslateAnimation(instructionsView, 0, instructionsView.getHeight(), 250);
+        instructionsView.startAnimation(animationHide);
+        final Handler hideViewAfterAnimationHandler = new Handler();
+        hideViewAfterAnimationHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        instructionsView.setVisibility(View.GONE);
+                    }
+                });
+            }
+        }, 250);
     }
 }

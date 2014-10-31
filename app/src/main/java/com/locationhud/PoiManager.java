@@ -3,6 +3,8 @@ package com.locationhud;
 import android.content.Context;
 
 import com.locationhud.compassdirection.MapPoint;
+import com.locationhud.storage.FileStorage;
+import com.locationhud.storage.JsonFactory;
 
 import org.json.JSONException;
 
