@@ -64,6 +64,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
                 onBackPressed();
             }
         });
+        UiUtility.setOnTouchColourChanges(navigationArrowBackButton, android.R.color.transparent, R.color.item_pressed_translucent);
     }
 
     @Override

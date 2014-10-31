@@ -1,11 +1,15 @@
 package com.locationhud;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,6 +34,9 @@ import java.util.Iterator;
  */
 public class PoiEditMapActivity extends FragmentActivity implements MyLocationFoundCallback, ConfirmSelectedLocationDialogCallback {
 
+    private static final String KEY_SETTINGS_SHARED_PREFERENCES = "settings";
+    private static final String KEY_INSTRUCTIONS_VIEWED_SETTING = "instructions_viewed";
+
     private Activity myActivity;
     private MyLocationManager locationManager;
     private GoogleMap map;
@@ -44,15 +51,33 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         setContentView(R.layout.activity_poi_edit_map);
         myActivity = this;
 
+        final SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(KEY_SETTINGS_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        boolean instructionsViewed = sharedPreferences.getBoolean(KEY_INSTRUCTIONS_VIEWED_SETTING, false);
+        if (instructionsViewed) {
+            hideInstructions();
+        } else {
+            final Button confirmInstructionsReadButton = (Button)findViewById(R.id.button_instructions_read);
+            confirmInstructionsReadButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+                    sharedPreferencesEditor.putBoolean(KEY_INSTRUCTIONS_VIEWED_SETTING, true);
+                    // sharedPreferencesEditor.commit(); // keep this commented out for now, for testing UI
+                    hideInstructions();
+                }
+            });
+            UiUtility.setOnTouchColourChanges(confirmInstructionsReadButton, android.R.color.transparent, R.color.item_pressed);
+        }
+
         locationManager = new MyLocationManager(this, this);
         locationManager.onCreate();
 
         SupportMapFragment mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
         map = mapFragment.getMap();
 
-        map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
-            public void onMapLongClick(LatLng latLong) {
+            public void onMapClick(LatLng latLong) {
                 lastAddedMarker = map.addMarker(new MarkerOptions().position(latLong).draggable(true));
                 lastLongClickLocation = latLong;
                 displayEditMarkerDialog(lastAddedMarker, "", myActivity.getString(R.string.save), myActivity.getString(R.string.cancel));
@@ -94,6 +119,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                 startActivity(intent);
             }
         });
+        UiUtility.setOnTouchColourChanges(navigationArrowForwardButton, android.R.color.transparent, R.color.item_pressed_translucent);
     }
 
     private void displayEditMarkerDialog(Marker marker, String name, String yesButtonText, String noButtonText) {
@@ -184,5 +210,10 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
             list.add((MapPoint)iterator.next());
         }
         PoiManager.setList(PoiManager.getCurrentList(), list);
+    }
+
+    private void hideInstructions() {
+        View instructionsView = findViewById(R.id.edit_poi_map_instructions);
+        instructionsView.setVisibility(View.GONE);
     }
 }

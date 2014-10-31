@@ -11,22 +11,12 @@
         android:layout_height="match_parent">
     </FrameLayout>
 
-    <LinearLayout
+    <ImageButton
+        android:id="@+id/navigation_arrow_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_alignParentTop="true"
-        android:orientation="horizontal"
         android:background="@android:color/transparent"
-        >
-        <ImageButton
-            android:id="@+id/navigation_arrow_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:paddingTop="15dp"
-            android:src="@drawable/ic_navigation_arrow_back"/>
-    </LinearLayout>
+        android:padding="15dp"
+        android:src="@drawable/ic_navigation_arrow_back"/>
 
 </RelativeLayout>
