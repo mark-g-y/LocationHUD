@@ -28,12 +28,14 @@ import java.util.List;
 public class CompassDirectionManager implements GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener,
         LocationListener,
-        SensorEventListener {
+        SensorEventListener,
+        MyLocationFoundCallback{
 
     private static final int MAX_DIRECTION_HISTORY_SIZE = 7;
 
-    private LocationClient locationClient;
-    private LocationManager locationManager;
+    //private LocationClient locationClient;
+    private MyLocationManager locationManager;
+    //private LocationManager locationManager;
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private Sensor magnetometer;
@@ -56,7 +58,8 @@ public class CompassDirectionManager implements GooglePlayServicesClient.Connect
 
     public Location getLastLocation() {
         if (isLocationConnected) {
-            return locationClient.getLastLocation();
+            return locationManager.getLastLocation();
+            //return locationClient.getLastLocation();
         }
         return null;
     }
@@ -93,8 +96,10 @@ public class CompassDirectionManager implements GooglePlayServicesClient.Connect
     }
 
     public void onCreate() {
-        locationClient = new LocationClient(activity, this, this);
-        locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+        //locationClient = new LocationClient(activity, this, this);
+        //locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+        locationManager = new MyLocationManager(activity, this, 10000);
+        locationManager.onCreate();
 
         sensorManager = (SensorManager) activity.getSystemService(activity.getApplicationContext().SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -102,23 +107,27 @@ public class CompassDirectionManager implements GooglePlayServicesClient.Connect
     }
 
     public void onStart() {
-        locationClient.connect();
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, this);
+        //locationClient.connect();
+        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, this);
+        locationManager.onStart();
     }
 
     public void onStop() {
-        locationClient.disconnect();
-        locationManager.removeUpdates(this);
+        //locationClient.disconnect();
+        //locationManager.removeUpdates(this);
+        locationManager.onStop();
     }
 
     public void onResume() {
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
         sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI);
+        locationManager.onResume();
     }
 
     public void onPause() {
         sensorManager.unregisterListener(this);
         isLocationConnected = false;
+        locationManager.onPause();
     }
 
     @Override
@@ -197,7 +206,7 @@ public class CompassDirectionManager implements GooglePlayServicesClient.Connect
     private void processBearingAngle(float[] orientation) {
         float azimut = orientation[0];
         azimuth = Math.toDegrees(azimut);
-        azimuth = convertMagneticNorthToTrueNorth(azimuth);
+        azimuth = locationManager.convertMagneticNorthToTrueNorth(azimuth);
         directionHistory.add(azimuth);
         if (directionHistory.size() >= MAX_DIRECTION_HISTORY_SIZE) {
             azimuth = getRefinedAverage(directionHistory);
@@ -208,16 +217,6 @@ public class CompassDirectionManager implements GooglePlayServicesClient.Connect
             }
             compassDirectionFoundCallback.onCompassDirectionFound(azimuth);
         }
-    }
-
-    private double convertMagneticNorthToTrueNorth(double azimuth) {
-        final GeomagneticField geoField = new GeomagneticField(
-                (float) locationClient.getLastLocation().getLatitude(),
-                (float) locationClient.getLastLocation().getLongitude(),
-                (float) locationClient.getLastLocation().getAltitude(),
-                System.currentTimeMillis());
-        azimuth += geoField.getDeclination(); // converts magnetic north into true north
-        return azimuth;
     }
 
     public static double getDistance(Location myLocation, MapPoint poi) {
@@ -243,5 +242,15 @@ public class CompassDirectionManager implements GooglePlayServicesClient.Connect
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
+    }
+
+    @Override
+    public void onMyLocationFound(Location location) {
+        isLocationConnected = true;
+    }
+
+    @Override
+    public void onMyLocationUnavailable() {
+        isLocationConnected = false;
     }
 }

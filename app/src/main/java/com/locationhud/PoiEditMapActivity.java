@@ -48,6 +48,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     private HashMap<Marker, MapPoint> markerToPoiMap = new HashMap<Marker, MapPoint>();
     private Marker lastAddedMarker;
     private LatLng lastLongClickLocation;
+    private boolean isLocationServicesOn = false;
     private boolean saveMapZoomState = false;
 
     @Override
@@ -74,7 +75,8 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
             UiUtility.setOnTouchColourChanges(confirmInstructionsReadButton, android.R.color.transparent, R.color.item_pressed);
         }
 
-        locationManager = new MyLocationManager(this, this);
+        isLocationServicesOn = MyLocationManager.isLocationServicesOn(this);
+        locationManager = new MyLocationManager(this, this, -1);
         locationManager.onCreate();
 
         SupportMapFragment mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
@@ -171,6 +173,11 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locationManager.getLastLocation().getLatitude(), locationManager.getLastLocation().getLongitude()), 12));
         }
      }
+
+    @Override
+    public void onMyLocationUnavailable() {
+
+    }
 
     @Override
     public void onCancel() {

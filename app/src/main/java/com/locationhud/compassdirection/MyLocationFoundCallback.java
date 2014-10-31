@@ -7,4 +7,5 @@ import android.location.Location;
  */
 public interface MyLocationFoundCallback {
     public void onMyLocationFound(Location location);
+    public void onMyLocationUnavailable();
 }

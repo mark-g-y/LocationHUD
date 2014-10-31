@@ -21,6 +21,7 @@ import com.locationhud.camera.PoiLayout;
 import com.locationhud.compassdirection.CompassDirectionFoundCallback;
 import com.locationhud.compassdirection.CompassDirectionManager;
 import com.locationhud.compassdirection.MapPoint;
+import com.locationhud.compassdirection.MyLocationManager;
 import com.locationhud.ui.UiUtility;
 
 import java.util.ArrayList;
@@ -79,6 +80,10 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         FrameLayout previewLayout = (FrameLayout) findViewById(R.id.camera_preview);
         previewLayout.removeAllViews();
         previewLayout.addView(preview);
+
+        if (!MyLocationManager.isLocationServicesOn(this)) {
+            MyLocationManager.promptUserTurnOnLocation(this);
+        }
     }
 
     @Override
