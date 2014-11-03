@@ -9,7 +9,7 @@
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
     <string name="dialog_confirm_selected_location_title">Edit this Point</string>
-    <string name="edit_poi_map_instructions">Tap to create/edit locations. Tap arrow view in 3D!</string>
+    <string name="edit_poi_map_instructions">Tap on map to create/edit locations.\nTap arrow to view locations in augmented reality!</string>
     <string name="confirm_instructions_read">OK, got it!</string>
 
     <string name="gps_not_found_title">GPS Not Found</string>

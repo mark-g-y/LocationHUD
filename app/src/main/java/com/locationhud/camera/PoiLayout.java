@@ -34,7 +34,7 @@ public class PoiLayout extends LinearLayout {
         //TextView titleTextView = (TextView) findViewById(R.id.title_view);
         //titleTextView.setText(poi.getTitle() + " | " + convertDistanceForDisplay(distance));
         TextView locationTextView = (TextView)findViewById(R.id.location_view);
-        locationTextView.setText(convertDistanceForDisplay(distance) + " | " + convertDoubleForDisplay(poi.getAltitude()) + "m");
+        locationTextView.setText("Dist. " + convertDistanceForDisplay(distance) + " | Alt." + convertDoubleForDisplay(poi.getAltitude()) + "m");
     }
 
     private String convertDistanceForDisplay(double distance) {

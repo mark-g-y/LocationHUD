@@ -36,8 +36,8 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
 
     private Camera camera;
     private CompassDirectionManager compassDirectionManager;
-    private ArrayList<MapPoint> poi;
-    private HashMap<MapPoint, PoiLayout> poiLayouts;
+    private ArrayList<MapPoint> poi = PoiManager.getList("Default");
+    private HashMap<MapPoint, PoiLayout> poiLayouts = new HashMap<MapPoint, PoiLayout>();
 
     private double verticalViewAngle;
     private double horizontalViewAngle;
@@ -46,9 +46,6 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hud);
-
-        poi = PoiManager.getList("Default");
-        poiLayouts = new HashMap<MapPoint, PoiLayout>();
 
         compassDirectionManager = new CompassDirectionManager(this, this);
         compassDirectionManager.onCreate();
