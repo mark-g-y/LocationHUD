@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -26,6 +27,7 @@ import com.locationhud.compassdirection.MyLocationFoundCallback;
 import com.locationhud.compassdirection.MyLocationManager;
 import com.locationhud.map.ConfirmSelectedLocationDialog;
 import com.locationhud.map.ConfirmSelectedLocationDialogCallback;
+import com.locationhud.storage.SharedPreferencesStorage;
 import com.locationhud.ui.AnimationFactory;
 import com.locationhud.ui.UiUtility;
 
@@ -38,9 +40,6 @@ import java.util.Iterator;
  * Created by Mark on 23/10/2014.
  */
 public class PoiEditMapActivity extends FragmentActivity implements MyLocationFoundCallback, ConfirmSelectedLocationDialogCallback {
-
-    private static final String KEY_SETTINGS_SHARED_PREFERENCES = "settings";
-    private static final String KEY_INSTRUCTIONS_VIEWED_SETTING = "instructions_viewed";
 
     private Activity myActivity;
     private MyLocationManager locationManager;
@@ -57,8 +56,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         setContentView(R.layout.activity_poi_edit_map);
         myActivity = this;
 
-        final SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(KEY_SETTINGS_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        boolean instructionsViewed = sharedPreferences.getBoolean(KEY_INSTRUCTIONS_VIEWED_SETTING, false);
+        boolean instructionsViewed = SharedPreferencesStorage.isInstructionsRead(getApplicationContext());
         if (instructionsViewed) {
             hideInstructions();
         } else {
@@ -66,9 +64,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
             confirmInstructionsReadButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
-                    sharedPreferencesEditor.putBoolean(KEY_INSTRUCTIONS_VIEWED_SETTING, true);
-                    // sharedPreferencesEditor.commit(); // keep this commented out for now, for testing UI
+                    SharedPreferencesStorage.setInstructionsRead(getApplicationContext(), true);
                     hideInstructions();
                 }
             });
@@ -114,6 +110,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                 markerToPoiMap.get(marker).updateLocation(marker.getPosition().latitude, marker.getPosition().longitude);
             }
         });
+        saveMapZoomState = SharedPreferencesStorage.loadMapCamera(getApplicationContext(), map);
 
         PoiManager.readLocationsFromFile(getApplicationContext());
         addLocationsInCurrentListToMap();
@@ -164,6 +161,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     public void onDestroy() {
         super.onDestroy();
         PoiManager.saveLocationsToFile(getApplicationContext());
+        SharedPreferencesStorage.saveMapCamera(getApplicationContext(), map);
     }
 
     @Override
