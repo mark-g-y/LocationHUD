@@ -47,7 +47,7 @@ public class SharedPreferencesStorage {
         double latitude = sharedPreferences.getFloat(MapCameraStorage.KEY_LATITUDE, -1);
         double longitude = sharedPreferences.getFloat(MapCameraStorage.KEY_LONGITUDE, -1);
         float zoom = sharedPreferences.getFloat(MapCameraStorage.KEY_ZOOM, -1);
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), zoom));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), zoom));
         return true;
     }
 

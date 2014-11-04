@@ -237,6 +237,6 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                     }
                 });
             }
-        }, 250);
+        }, 150);
     }
 }
