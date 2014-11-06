@@ -12,11 +12,11 @@
     </FrameLayout>
 
     <ImageButton
-        android:id="@+id/navigation_arrow_back"
+        android:id="@+id/navigation_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:padding="15dp"
-        android:src="@drawable/ic_navigation_arrow_back"/>
+        android:src="@drawable/ic_navigation_menu"/>
 
 </RelativeLayout>

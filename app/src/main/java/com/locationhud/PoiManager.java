@@ -8,8 +8,10 @@ import com.locationhud.storage.JsonFactory;
 
 import org.json.JSONException;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Created by Mark on 23/10/2014.
@@ -21,11 +23,18 @@ public class PoiManager {
     private static String currentList = "Default";
 
     static {
+        try {
+            poiMap = JsonFactory.decodeJsonForPois(FileStorage.readFromRawResFile());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         ArrayList<MapPoint> def = new ArrayList<MapPoint>();
         def.add(new MapPoint("Mission Peak", 37.512643, -121.880493, 767));
         def.add(new MapPoint("San Francisco", 37.808305, -122.409104));
         def.add(new MapPoint("Home", 37.420980, -121.900235));
         poiMap.put("Default", def);
+
+
     }
 
     public static void addList() {
@@ -46,6 +55,15 @@ public class PoiManager {
 
     public static String getCurrentList() {
         return currentList;
+    }
+
+    public static ArrayList<String> getSupportedPoiLists() {
+        ArrayList<String> list = new ArrayList<String>();
+        Iterator iterator = poiMap.keySet().iterator();
+        while(iterator.hasNext()) {
+            list.add((String) iterator.next());
+        }
+        return list;
     }
 
     public static void saveLocationsToFile(Context context) {

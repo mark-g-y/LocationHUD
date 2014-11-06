@@ -2,6 +2,7 @@ package com.locationhud;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.hardware.Camera;
 import android.location.Location;
@@ -22,6 +23,7 @@ import com.locationhud.compassdirection.CompassDirectionFoundCallback;
 import com.locationhud.compassdirection.CompassDirectionManager;
 import com.locationhud.compassdirection.MapPoint;
 import com.locationhud.compassdirection.MyLocationManager;
+import com.locationhud.selectpoilist.SelectPoiListActivity;
 import com.locationhud.ui.UiUtility;
 
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
 
     private static final int MAX_VIEW_DISTANCE = 300 * 1000;
 
+    private Context context;
     private Camera camera;
     private CompassDirectionManager compassDirectionManager;
     private ArrayList<MapPoint> poi = PoiManager.getList("Default");
@@ -44,6 +47,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        context = getApplicationContext();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hud);
 
@@ -58,14 +62,15 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
             layoutHudActivity.addView(poiLayout);
         }
 
-        ImageButton navigationArrowBackButton = (ImageButton)findViewById(R.id.navigation_arrow_back);
-        navigationArrowBackButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton navigationMenuButton = (ImageButton)findViewById(R.id.navigation_menu);
+        navigationMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onBackPressed();
+                Intent intent = new Intent(context, SelectPoiListActivity.class);
+                startActivity(intent);
             }
         });
-        UiUtility.setOnTouchColourChanges(navigationArrowBackButton, android.R.color.transparent, R.color.item_pressed_translucent);
+        UiUtility.setOnTouchColourChanges(navigationMenuButton, android.R.color.transparent, R.color.item_pressed_translucent);
     }
 
     @Override

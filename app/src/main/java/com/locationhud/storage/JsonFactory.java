@@ -38,7 +38,7 @@ public class JsonFactory {
                 pointJson.put(MapPoint.ALTITUDE_LABEL, point.getAltitude());
                 poiListArray.put(pointJson);
             }
-            poiList.put((String)pairs.getKey(), poiListArray);
+            poiList.put(MapPoint.POI_LIST_LABEL, poiListArray);
             poi.put(poiList);
             iterator.remove(); // avoids a ConcurrentModificationException
         }
@@ -54,7 +54,7 @@ public class JsonFactory {
             JSONObject poiList = (JSONObject)poi.get(i);
             String key = poiList.getString(MapPoint.LIST_LABEL);
             ArrayList<MapPoint> poiPoints = new ArrayList<MapPoint>();
-            JSONArray poiListArray = poiList.getJSONArray(key);
+            JSONArray poiListArray = poiList.getJSONArray(MapPoint.POI_LIST_LABEL);
             for (int m = 0; m < poiListArray.length(); m++) {
                 JSONObject pointJson = (JSONObject)poiListArray.get(m);
                 MapPoint point = new MapPoint(pointJson.getString(MapPoint.TITLE_LABEL), pointJson.getDouble(MapPoint.LATITUDE_LABEL), pointJson.getDouble(MapPoint.LONGITUDE_LABEL), pointJson.getDouble(MapPoint.ALTITUDE_LABEL));

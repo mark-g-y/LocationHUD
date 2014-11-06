@@ -1,11 +1,13 @@
 package com.locationhud.storage;
 
 import android.content.Context;
+import android.content.res.Resources;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
@@ -28,6 +30,25 @@ public class FileStorage {
             reader.close();
             in.close();
             fis.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return builder.toString();
+    }
+
+    public static String readFromRawResFile() {
+        StringBuilder builder = new StringBuilder();
+        try {
+            String file = "res/raw/provided_pois.txt"; // res/raw/test.txt also work.
+            InputStream in = FileStorage.class.getClassLoader().getResourceAsStream(file);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+            }
+            reader.close();
+            in.close();
         } catch (Exception e) {
             e.printStackTrace();
             return null;

@@ -42,7 +42,7 @@ public class RetrieveAltitudeTask extends AsyncTask<Void, Void, Void> {
     }
 
     private double getElevationFromGoogleMaps(double longitude, double latitude) {
-        double result = Double.NaN;
+        double result = 0;
         HttpClient httpClient = new DefaultHttpClient();
         HttpContext localContext = new BasicHttpContext();
         String url = "http://maps.googleapis.com/maps/api/elevation/"

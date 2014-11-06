@@ -18,19 +18,23 @@
         <activity
             android:name=".HudActivity"
             android:label="@string/app_name" >
-        </activity>
-        <activity
-            android:name=".PoiEditMapActivity"
-            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".PoiEditMapActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".selectpoilist.SelectPoiListActivity"
+            android:label="@string/app_name" >
+        </activity>
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value=""/>
+            android:value="KEY"/>
     </application>
 
 </manifest>

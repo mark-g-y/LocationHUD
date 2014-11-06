@@ -9,6 +9,7 @@ import com.locationhud.altituderetrieval.RetrieveAltitudeTask;
 public class MapPoint implements AltitudeFoundCallback {
 
     public static final String LIST_LABEL = "list";
+    public static final String POI_LIST_LABEL = "poi_list";
     public static final String TITLE_LABEL = "title";
     public static final String LATITUDE_LABEL = "latitude";
     public static final String LONGITUDE_LABEL = "longitude";
