@@ -26,6 +26,10 @@ public class PoiListAdapter extends BaseAdapter {
         this.poiLists = poiLists;
     }
 
+    public void updateData(ArrayList<String> poiLists) {
+        this.poiLists = poiLists;
+    }
+
     @Override
     public int getCount() {
         return poiLists.size();

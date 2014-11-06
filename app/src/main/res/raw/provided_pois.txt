@@ -9,5 +9,16 @@
                 altitude:0
             }
         ]
+    },
+    {
+        list:"San Jose",
+        poi_list:[
+            {
+                title:"San Francisco",
+                latitude:37.808305,
+                longitude:-122.409104,
+                altitude:0
+            }
+        ]
     }
 ]
