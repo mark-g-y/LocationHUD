@@ -10,12 +10,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageButton
+        <com.locationhud.ui.buttons.CustomImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="15dp"
             android:src="@drawable/ic_navigation_arrow_back"
-            android:background="@android:color/transparent"
             android:id="@+id/navigation_arrow_back"/>
 
         <TextView
@@ -36,11 +35,10 @@
             android:visibility="gone"
             android:id="@+id/search_bar"/>
 
-        <ImageButton
+        <com.locationhud.ui.buttons.CustomImageButton
             android:id="@+id/search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
             android:paddingRight="15dp"
             android:layout_gravity="center_vertical"
             android:src="@drawable/ic_action_search"

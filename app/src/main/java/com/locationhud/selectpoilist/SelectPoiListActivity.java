@@ -34,6 +34,14 @@ public class SelectPoiListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_poi_list);
 
+        ImageButton backButton = (ImageButton)findViewById(R.id.navigation_arrow_back);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
         final PoiListAdapter listAdapter = new PoiListAdapter(getApplicationContext(), PoiManager.getSupportedPoiLists());
         final ListView poiListView = (ListView)findViewById(R.id.poi_list_view);
         poiListView.setAdapter(listAdapter);
