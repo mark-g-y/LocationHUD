@@ -33,8 +33,6 @@ public class PoiManager {
         def.add(new MapPoint("San Francisco", 37.808305, -122.409104));
         def.add(new MapPoint("Home", 37.420980, -121.900235));
         poiMap.put("Default", def);
-
-
     }
 
     public static void addList() {
@@ -83,5 +81,9 @@ public class PoiManager {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void setCurrentList(String currentList) {
+        PoiManager.currentList = currentList;
     }
 }

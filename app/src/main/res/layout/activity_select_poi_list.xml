@@ -18,11 +18,33 @@
             android:background="@android:color/transparent"
             android:id="@+id/navigation_arrow_back"/>
 
+        <TextView
+            android:id="@+id/search_title"
+            android:text="@string/search_poi_list_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="16sp"
+            android:layout_weight="1"/>
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:hint="@string/search_poi_list_hint"
+            android:visibility="gone"
             android:id="@+id/search_bar"/>
+
+        <ImageButton
+            android:id="@+id/search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:paddingRight="15dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_action_search"
+            />
 
     </LinearLayout>
 

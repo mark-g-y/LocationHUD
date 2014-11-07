@@ -39,7 +39,8 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
     private Context context;
     private Camera camera;
     private CompassDirectionManager compassDirectionManager;
-    private ArrayList<MapPoint> poi = PoiManager.getList("Default");
+    private String currentList = "Default";
+    private ArrayList<MapPoint> poi = PoiManager.getList(currentList);
     private HashMap<MapPoint, PoiLayout> poiLayouts = new HashMap<MapPoint, PoiLayout>();
 
     private double verticalViewAngle;
@@ -51,16 +52,10 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hud);
 
+        loadPoiLayouts();
+
         compassDirectionManager = new CompassDirectionManager(this, this);
         compassDirectionManager.onCreate();
-
-        RelativeLayout layoutHudActivity = (RelativeLayout)findViewById(R.id.activity_hud_layout);
-        for (int i = 0; i < poi.size(); i++) {
-            PoiLayout poiLayout = new PoiLayout(getApplicationContext(), poi.get(i));
-            poiLayout.setVisibility(View.GONE);
-            poiLayouts.put(poi.get(i), poiLayout);
-            layoutHudActivity.addView(poiLayout);
-        }
 
         ImageButton navigationMenuButton = (ImageButton)findViewById(R.id.navigation_menu);
         navigationMenuButton.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +84,10 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         if (!MyLocationManager.isLocationServicesOn(this)) {
             MyLocationManager.promptUserTurnOnLocation(this);
         }
+
+        if (!currentList.equals(PoiManager.getCurrentList())) {
+            loadPoiLayouts();
+        }
     }
 
     @Override
@@ -115,6 +114,19 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
     protected void onDestroy() {
         super.onDestroy();
         finish();
+    }
+
+    private void loadPoiLayouts() {
+        currentList = PoiManager.getCurrentList();
+        poi = PoiManager.getList(currentList);
+        poiLayouts.clear();
+        RelativeLayout layoutHudActivity = (RelativeLayout) findViewById(R.id.activity_hud_layout);
+        for (int i = 0; i < poi.size(); i++) {
+            PoiLayout poiLayout = new PoiLayout(getApplicationContext(), poi.get(i));
+            poiLayout.setVisibility(View.GONE);
+            poiLayouts.put(poi.get(i), poiLayout);
+            layoutHudActivity.addView(poiLayout);
+        }
     }
 
     private Camera getCamera() {
