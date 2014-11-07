@@ -40,7 +40,7 @@ public class JsonFactory {
             }
             poiList.put(MapPoint.POI_LIST_LABEL, poiListArray);
             poi.put(poiList);
-            iterator.remove(); // avoids a ConcurrentModificationException
+            //iterator.remove(); // avoids a ConcurrentModificationException
         }
         Log.d("GENERATEJSON", poi.toString());
         return poi;

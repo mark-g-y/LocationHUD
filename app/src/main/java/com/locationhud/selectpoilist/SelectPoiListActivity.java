@@ -1,19 +1,26 @@
 package com.locationhud.selectpoilist;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.locationhud.PoiEditMapActivity;
 import com.locationhud.PoiManager;
 import com.locationhud.R;
+import com.locationhud.utility.IntentTransferCodes;
 
 import org.w3c.dom.Text;
 
@@ -25,12 +32,14 @@ import java.util.ArrayList;
  */
 public class SelectPoiListActivity extends Activity {
 
+    private Activity myActivity;
     private TrieNode head;
     private ArrayList<String> searchResults = PoiManager.getSupportedPoiLists();
     private EditText searchBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        myActivity = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_poi_list);
 
@@ -63,6 +72,30 @@ public class SelectPoiListActivity extends Activity {
                         listAdapter.notifyDataSetChanged();
                     }
                 });
+            }
+        });
+        poiListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long l) {
+                final CharSequence[] items = {
+                        "Edit", "Delete"
+                };
+                AlertDialog.Builder builder = new AlertDialog.Builder(SelectPoiListActivity.this);
+                builder.setTitle("Make your selection");
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (item == 0) {
+                            Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
+                            intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, searchResults.get(position));
+                            myActivity.startActivity(intent);
+                        } else {
+                            // delete list
+                        }
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+                return false;
             }
         });
 
@@ -112,13 +145,21 @@ public class SelectPoiListActivity extends Activity {
                     searchBar.setVisibility(View.VISIBLE);
                     searchTitle.setVisibility(View.GONE);
                     searchActionButton.setVisibility(View.GONE);
+                    setKeyboardShowing(searchBar, true);
                 } else {
                     searchBar.setVisibility(View.GONE);
                     searchTitle.setVisibility(View.VISIBLE);
                     searchActionButton.setVisibility(View.VISIBLE);
+                    setKeyboardShowing(searchBar, false);
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PoiManager.saveLocationsToFile(getApplicationContext());
     }
 
     @Override
@@ -127,6 +168,15 @@ public class SelectPoiListActivity extends Activity {
             searchBar.clearFocus();
         } else {
             super.onBackPressed();
+        }
+    }
+
+    private void setKeyboardShowing(EditText editText, boolean showing) {
+        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (showing) {
+            mgr.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+        } else {
+            mgr.hideSoftInputFromWindow(editText.getWindowToken(), 0);
         }
     }
 

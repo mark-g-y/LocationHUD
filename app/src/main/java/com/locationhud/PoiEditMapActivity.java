@@ -30,6 +30,7 @@ import com.locationhud.map.ConfirmSelectedLocationDialogCallback;
 import com.locationhud.storage.SharedPreferencesStorage;
 import com.locationhud.ui.AnimationFactory;
 import com.locationhud.ui.UiUtility;
+import com.locationhud.utility.IntentTransferCodes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,12 +50,18 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     private LatLng lastLongClickLocation;
     private boolean isLocationServicesOn = false;
     private boolean saveMapZoomState = false;
+    private String poiList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_poi_edit_map);
         myActivity = this;
+
+        poiList = getIntent().getStringExtra(IntentTransferCodes.CURRENT_POI_LIST);
+        if (poiList == null) {
+            poiList = "Default";
+        }
 
         boolean instructionsViewed = SharedPreferencesStorage.isInstructionsRead(getApplicationContext());
         if (instructionsViewed) {
@@ -112,7 +119,6 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         });
         saveMapZoomState = SharedPreferencesStorage.loadMapCamera(getApplicationContext(), map);
 
-        PoiManager.readLocationsFromFile(getApplicationContext());
         addLocationsInCurrentListToMap();
 
         ImageButton navigationArrowForwardButton = (ImageButton)findViewById(R.id.navigation_arrow_forward);
@@ -123,7 +129,6 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                 startActivity(intent);
             }
         });
-        UiUtility.setOnTouchColourChanges(navigationArrowForwardButton, android.R.color.transparent, R.color.item_pressed_translucent);
     }
 
     private void displayEditMarkerDialog(Marker marker, String name, String yesButtonText, String noButtonText) {
@@ -160,7 +165,6 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     @Override
     public void onDestroy() {
         super.onDestroy();
-        PoiManager.saveLocationsToFile(getApplicationContext());
         SharedPreferencesStorage.saveMapCamera(getApplicationContext(), map);
     }
 
@@ -204,7 +208,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     }
 
     private void addLocationsInCurrentListToMap() {
-        ArrayList<MapPoint> list = PoiManager.getList(PoiManager.getCurrentList());
+        ArrayList<MapPoint> list = PoiManager.getList(poiList);
         for (int i = 0; i < list.size(); i++) {
             MapPoint mp = list.get(i);
             Marker marker = map.addMarker(new MarkerOptions().position(new LatLng(mp.getLatitude(), mp.getLongitude())).draggable(true));
@@ -219,7 +223,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         while (iterator.hasNext()) {
             list.add((MapPoint)iterator.next());
         }
-        PoiManager.setList(PoiManager.getCurrentList(), list);
+        PoiManager.setList(poiList, list);
     }
 
     private void hideInstructions() {

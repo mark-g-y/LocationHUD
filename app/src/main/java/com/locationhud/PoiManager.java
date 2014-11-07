@@ -83,7 +83,7 @@ public class PoiManager {
         }
     }
 
-    public static void setCurrentList(String currentList) {
-        PoiManager.currentList = currentList;
+    public static void setCurrentList(String list) {
+        currentList = list;
     }
 }

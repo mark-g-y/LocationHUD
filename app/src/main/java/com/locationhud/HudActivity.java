@@ -51,6 +51,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         context = getApplicationContext();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hud);
+        PoiManager.readLocationsFromFile(getApplicationContext());
 
         loadPoiLayouts();
 
@@ -85,9 +86,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
             MyLocationManager.promptUserTurnOnLocation(this);
         }
 
-        if (!currentList.equals(PoiManager.getCurrentList())) {
-            loadPoiLayouts();
-        }
+        loadPoiLayouts();
     }
 
     @Override
@@ -120,6 +119,10 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         currentList = PoiManager.getCurrentList();
         poi = PoiManager.getList(currentList);
         poiLayouts.clear();
+        if (poi == null) {
+            poi = new ArrayList<MapPoint>();
+            return;
+        }
         RelativeLayout layoutHudActivity = (RelativeLayout) findViewById(R.id.activity_hud_layout);
         for (int i = 0; i < poi.size(); i++) {
             PoiLayout poiLayout = new PoiLayout(getApplicationContext(), poi.get(i));
