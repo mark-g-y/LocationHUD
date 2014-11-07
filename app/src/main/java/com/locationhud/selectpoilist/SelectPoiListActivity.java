@@ -42,6 +42,14 @@ public class SelectPoiListActivity extends Activity {
             }
         });
 
+        ImageButton newListButton = (ImageButton)findViewById(R.id.add_new_list);
+        newListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
         final PoiListAdapter listAdapter = new PoiListAdapter(getApplicationContext(), PoiManager.getSupportedPoiLists());
         final ListView poiListView = (ListView)findViewById(R.id.poi_list_view);
         poiListView.setAdapter(listAdapter);
@@ -49,6 +57,12 @@ public class SelectPoiListActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 PoiManager.setCurrentList(searchResults.get(i));
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        listAdapter.notifyDataSetChanged();
+                    }
+                });
             }
         });
 

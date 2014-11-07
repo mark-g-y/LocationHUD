@@ -1,6 +1,7 @@
 package com.locationhud.selectpoilist;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.locationhud.PoiManager;
 import com.locationhud.R;
 import com.locationhud.compassdirection.MapPoint;
 
@@ -61,6 +63,12 @@ public class PoiListAdapter extends BaseAdapter {
             viewHolder = (ViewHolder)view.getTag();
         }
         viewHolder.title.setText(poiLists.get(i));
+
+        if (poiLists.get(i).equals(PoiManager.getCurrentList())) {
+            viewHolder.title.setTypeface(null, Typeface.BOLD);
+        } else {
+            viewHolder.title.setTypeface(null, Typeface.NORMAL);
+        }
 
         return view;
     }
