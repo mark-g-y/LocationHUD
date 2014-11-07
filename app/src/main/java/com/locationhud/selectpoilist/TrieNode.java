@@ -34,16 +34,7 @@ public class TrieNode {
     public static TrieNode createTrie(ArrayList<String> list) {
         TrieNode head = new TrieNode('\0');
         for (String element : list) {
-            TrieNode ptr = head;
-            for (int i = 0; i < element.length(); i++) {
-                char d = Character.toLowerCase(element.charAt(i));
-                if (ptr.next.get(d) == null) {
-                    TrieNode node = new TrieNode(d);
-                    ptr.next.put(d, node);
-                }
-                ptr = ptr.next.get(d);
-            }
-            ptr.end.add(element);
+            insertString(head, element);
         }
         return head;
     }
@@ -64,5 +55,18 @@ public class TrieNode {
             list.add(iterator.next());
         }
         return list;
+    }
+
+    public static void insertString(TrieNode head, String element) {
+        TrieNode ptr = head;
+        for (int i = 0; i < element.length(); i++) {
+            char d = Character.toLowerCase(element.charAt(i));
+            if (ptr.next.get(d) == null) {
+                TrieNode node = new TrieNode(d);
+                ptr.next.put(d, node);
+            }
+            ptr = ptr.next.get(d);
+        }
+        ptr.end.add(element);
     }
 }

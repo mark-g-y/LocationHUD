@@ -55,7 +55,29 @@ public class SelectPoiListActivity extends Activity {
         newListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(myActivity);
+                alert.setTitle(getResources().getString(R.string.new_poi_list_title_prompt));
+                final EditText input = new EditText(myActivity);
+                alert.setView(input);
 
+                alert.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String value = input.getText().toString();
+                        PoiManager.addList(value);
+                        Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
+                        intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, value);
+                        myActivity.startActivity(intent);
+                        searchResults.add(value);
+                        TrieNode.insertString(head, value);
+                    }
+                });
+
+                alert.setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                });
+
+                alert.show();
             }
         });
 

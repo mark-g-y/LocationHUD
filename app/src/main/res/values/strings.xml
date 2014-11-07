@@ -17,5 +17,6 @@
     <string name="ok">OK</string>
     <string name="search_poi_list_title">Load Points of Interest</string>
     <string name="search_poi_list_hint">Search</string>
+    <string name="new_poi_list_title_prompt">Name of Points of Interest List</string>
 
 </resources>
