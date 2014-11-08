@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Stack;
 
 /**
  * Created by Mark on 05/11/2014.
@@ -71,6 +72,28 @@ public class TrieNode {
     }
 
     public static void deleteString(TrieNode head, String element) {
-        
+        TrieNode ptr = head;
+        Stack<TrieNode> parents = new Stack<TrieNode>();
+        for (int i = 0; i < element.length(); i++) {
+            parents.push(ptr);
+            TrieNode next = ptr.next.get(element.charAt(i));
+            if (next != null) {
+                ptr = next;
+            } else {
+                // already deleted
+                return;
+            }
+        }
+        int index = ptr.end.indexOf(element);
+        ptr.end.remove(index);
+        index = element.length() - 1;
+        if (ptr.next.size() == 0) {
+            TrieNode lastNode = parents.pop();
+            while (!parents.isEmpty() && lastNode.next.size() == 1) {
+                lastNode = parents.pop();
+                index--;
+            }
+            lastNode.next.remove(element.charAt(index));
+        }
     }
 }
