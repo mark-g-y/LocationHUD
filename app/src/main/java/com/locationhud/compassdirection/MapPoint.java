@@ -1,7 +1,7 @@
 package com.locationhud.compassdirection;
 
-import com.locationhud.altituderetrieval.AltitudeFoundCallback;
-import com.locationhud.altituderetrieval.RetrieveAltitudeTask;
+import com.locationhud.googleapi.retrievealtitude.AltitudeFoundCallback;
+import com.locationhud.googleapi.retrievealtitude.RetrieveAltitudeTask;
 
 /**
  * Created by Mark on 19/10/2014.

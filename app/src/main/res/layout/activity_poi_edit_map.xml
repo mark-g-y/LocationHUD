@@ -11,16 +11,40 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         />
 
-    <ImageButton
-        android:id="@+id/navigation_arrow_forward"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:gravity="center_vertical|right"
-        android:padding="15dp"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_navigation_arrow_forward"/>
+        android:orientation="horizontal"
+        android:background="@color/white_darker_translucent"
+        >
+
+        <AutoCompleteTextView
+            android:id="@+id/prompt_to_select_poi"
+            android:hint="@string/prompt_to_select_poi"
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            />
+
+        <ImageButton
+            android:id="@+id/navigation_arrow_forward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical|right"
+            android:padding="15dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_navigation_arrow_forward"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/edit_poi_map_instructions"

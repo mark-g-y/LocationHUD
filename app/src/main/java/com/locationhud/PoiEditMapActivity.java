@@ -1,30 +1,34 @@
 package com.locationhud;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
+import android.view.KeyEvent;
 import android.view.View;
-import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.locationhud.compassdirection.MapPoint;
 import com.locationhud.compassdirection.MyLocationFoundCallback;
 import com.locationhud.compassdirection.MyLocationManager;
+import com.locationhud.googleapi.placesautocomplete.PlacesAutoCompleteAdapter;
+import com.locationhud.googleapi.placesdetail.LatitudeLongitudeFoundCallback;
+import com.locationhud.googleapi.placesdetail.LatitudeLongitudeRetrievalTask;
 import com.locationhud.map.ConfirmSelectedLocationDialog;
 import com.locationhud.map.ConfirmSelectedLocationDialogCallback;
 import com.locationhud.storage.SharedPreferencesStorage;
@@ -40,9 +44,11 @@ import java.util.Iterator;
 /**
  * Created by Mark on 23/10/2014.
  */
-public class PoiEditMapActivity extends FragmentActivity implements MyLocationFoundCallback, ConfirmSelectedLocationDialogCallback {
+public class PoiEditMapActivity extends FragmentActivity implements MyLocationFoundCallback,
+        ConfirmSelectedLocationDialogCallback, LatitudeLongitudeFoundCallback {
 
     private Activity myActivity;
+    private LatitudeLongitudeFoundCallback callback;
     private MyLocationManager locationManager;
     private GoogleMap map;
     private HashMap<Marker, MapPoint> markerToPoiMap = new HashMap<Marker, MapPoint>();
@@ -57,11 +63,34 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_poi_edit_map);
         myActivity = this;
+        callback = this;
 
         poiList = getIntent().getStringExtra(IntentTransferCodes.CURRENT_POI_LIST);
         if (poiList == null) {
             poiList = "Default";
         }
+
+        AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.prompt_to_select_poi);
+        final PlacesAutoCompleteAdapter placesAutoCompleteAdapter = new PlacesAutoCompleteAdapter(this, R.layout.places_autocomplete_list_item);
+        autoCompView.setAdapter(placesAutoCompleteAdapter);
+        autoCompView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                selectAddressToAdd(placesAutoCompleteAdapter, position);
+            }
+        });
+        autoCompView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    if (placesAutoCompleteAdapter.hasElements()) {
+                        selectAddressToAdd(placesAutoCompleteAdapter, 0);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
 
         boolean instructionsViewed = SharedPreferencesStorage.isInstructionsRead(getApplicationContext());
         if (instructionsViewed) {
@@ -88,9 +117,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLong) {
-                lastAddedMarker = map.addMarker(new MarkerOptions().position(latLong).draggable(true));
-                lastLongClickLocation = latLong;
-                displayEditMarkerDialog(lastAddedMarker, "", myActivity.getString(R.string.save), myActivity.getString(R.string.cancel));
+                addMarker(latLong);
             }
         });
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -129,6 +156,12 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                 startActivity(intent);
             }
         });
+    }
+
+    private void addMarker(LatLng latLong) {
+        lastAddedMarker = map.addMarker(new MarkerOptions().position(latLong).draggable(true));
+        lastLongClickLocation = latLong;
+        displayEditMarkerDialog(lastAddedMarker, "", myActivity.getString(R.string.save), myActivity.getString(R.string.cancel));
     }
 
     private void displayEditMarkerDialog(Marker marker, String name, String yesButtonText, String noButtonText) {
@@ -226,6 +259,12 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         PoiManager.setList(poiList, list);
     }
 
+    private void selectAddressToAdd(PlacesAutoCompleteAdapter placesAutoCompleteAdapter, int position) {
+        String placeId = placesAutoCompleteAdapter.getPlaceId(position);
+        LatitudeLongitudeRetrievalTask task = new LatitudeLongitudeRetrievalTask(callback, placeId);
+        task.execute();
+    }
+
     private void hideInstructions() {
         final View instructionsView = findViewById(R.id.edit_poi_map_instructions);
         TranslateAnimation animationHide = AnimationFactory.buildTranslateAnimation(instructionsView, 0, instructionsView.getHeight(), 250);
@@ -242,5 +281,17 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                 });
             }
         }, 150);
+    }
+
+    @Override
+    public void onLatitudeLongitudeFound(LatLng latLng) {
+        if (latLng != null) {
+            AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.prompt_to_select_poi);
+            autoCompView.setText("");
+            addMarker(latLng);
+
+        } else {
+            Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.error_get_lat_lng), Toast.LENGTH_SHORT).show();
+        }
     }
 }

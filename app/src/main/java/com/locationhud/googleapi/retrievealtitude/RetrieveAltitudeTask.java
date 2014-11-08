@@ -1,6 +1,8 @@
-package com.locationhud.altituderetrieval;
+package com.locationhud.googleapi.retrievealtitude;
 
 import android.os.AsyncTask;
+
+import com.locationhud.googleapi.GoogleApiManager;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -49,7 +51,7 @@ public class RetrieveAltitudeTask extends AsyncTask<Void, Void, Void> {
                 + "xml?locations=" + String.valueOf(latitude)
                 + "," + String.valueOf(longitude)
                 + "&sensor=true"
-                + "key=" + AltitudeRetrievalManager.KEY;
+                + "key=" + GoogleApiManager.GOOGLE_API_KEY;
         HttpGet httpGet = new HttpGet(url);
         try {
             HttpResponse response = httpClient.execute(httpGet, localContext);

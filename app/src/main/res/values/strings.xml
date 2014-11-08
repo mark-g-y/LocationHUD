@@ -22,5 +22,7 @@
     <string name="default_list">Default Lists</string>
     <string name="edit">Edit</string>
     <string name="poi_name_exists_error">Error: this name already exists! Please pick something else.</string>
+    <string name="prompt_to_select_poi">Search for a Point of Interest</string>
+    <string name="error_get_lat_lng">Error: could not retrieve address location. Please try again</string>
 
 </resources>

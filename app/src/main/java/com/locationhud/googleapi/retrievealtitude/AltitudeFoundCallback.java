@@ -1,4 +1,4 @@
-package com.locationhud.altituderetrieval;
+package com.locationhud.googleapi.retrievealtitude;
 
 /**
  * Created by Mark on 29/10/2014.
