@@ -42,13 +42,13 @@ public class JsonFactory {
             poi.put(poiList);
             //iterator.remove(); // avoids a ConcurrentModificationException
         }
-        Log.d("GENERATEJSON", poi.toString());
+        //Log.d("GENERATEJSON", poi.toString());
         return poi;
     }
 
     public static HashMap<String, ArrayList<MapPoint>> decodeJsonForPois(String jsonPoi) throws JSONException{
         HashMap<String, ArrayList<MapPoint>> poiMap = new HashMap<String, ArrayList<MapPoint>>();
-        Log.d("FOO", jsonPoi);
+        //Log.d("FOO", jsonPoi);
         JSONArray poi = new JSONArray(jsonPoi);
         for (int i = 0; i < poi.length(); i++) {
             JSONObject poiList = (JSONObject)poi.get(i);

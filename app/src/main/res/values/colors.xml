@@ -7,6 +7,7 @@
     <color name="holo_blue_dark">#ff0099cc</color>
     <color name="holo_blue_light">#ff33b5e5</color>
     <color name="holo_blue_light_translucent">#7533b5e5</color>
+    <color name="light_gray">#dfdfdf</color>
     <color name="item_pressed">#FFc5c5c5</color>
     <color name="item_pressed_translucent">#75c5c5c5</color>
 </resources>

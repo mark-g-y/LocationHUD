@@ -8,24 +8,24 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.locationhud.PoiEditMapActivity;
 import com.locationhud.PoiManager;
 import com.locationhud.R;
+import com.locationhud.utility.ActivityResultCodes;
 import com.locationhud.utility.IntentTransferCodes;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by Mark on 05/11/2014.
@@ -33,9 +33,12 @@ import java.util.ArrayList;
 public class SelectPoiListActivity extends Activity {
 
     private Activity myActivity;
-    private TrieNode head;
-    private ArrayList<String> searchResults = PoiManager.getSupportedPoiLists();
+    private TrieNode customListHead;
+    private TrieNode defaultListHead;
+    private ArrayList<String> customListSearchResults = PoiManager.getCustomPoiLists();
+    private ArrayList<String> defaultListSearchResults = PoiManager.getDefaultPoiLists();
     private EditText searchBar;
+    private PoiListAdapter listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +65,6 @@ public class SelectPoiListActivity extends Activity {
 
                 alert.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        String value = input.getText().toString();
-                        PoiManager.addList(value);
-                        Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
-                        intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, value);
-                        myActivity.startActivity(intent);
-                        searchResults.add(value);
-                        TrieNode.insertString(head, value);
                     }
                 });
 
@@ -77,51 +73,100 @@ public class SelectPoiListActivity extends Activity {
                     }
                 });
 
-                alert.show();
+                final AlertDialog dialog = alert.show();
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String value = input.getText().toString();
+                        if (PoiManager.getList(value) != null) {
+                            Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.poi_name_exists_error), Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        PoiManager.addList(value);
+                        Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
+                        intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, value);
+                        myActivity.startActivity(intent);
+                        customListSearchResults.add(value);
+                        updateListAdapter();
+                        TrieNode.insertString(customListHead, value);
+                        dialog.dismiss();
+                    }
+                });
             }
         });
 
-        final PoiListAdapter listAdapter = new PoiListAdapter(getApplicationContext(), PoiManager.getSupportedPoiLists());
-        final ListView poiListView = (ListView)findViewById(R.id.poi_list_view);
+        listAdapter = new PoiListAdapter(getApplicationContext(), PoiManager.getCustomPoiLists(), PoiManager.getDefaultPoiLists());
+        updateListAdapter();
+        final ExpandableListView poiListView = (ExpandableListView)findViewById(R.id.poi_expandable_list_view);
         poiListView.setAdapter(listAdapter);
-        poiListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        poiListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                PoiManager.setCurrentList(searchResults.get(i));
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int position, long l) {
+                if (groupPosition == 0) {
+                    PoiManager.setCurrentList(customListSearchResults.get(position));
+                } else {
+                    PoiManager.setCurrentList(defaultListSearchResults.get(position));
+                }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         listAdapter.notifyDataSetChanged();
                     }
                 });
-            }
-        });
-        poiListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long l) {
-                final CharSequence[] items = {
-                        "Edit", "Delete"
-                };
-                AlertDialog.Builder builder = new AlertDialog.Builder(SelectPoiListActivity.this);
-                builder.setTitle("Make your selection");
-                builder.setItems(items, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        if (item == 0) {
-                            Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
-                            intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, searchResults.get(position));
-                            myActivity.startActivity(intent);
-                        } else {
-                            // delete list
-                        }
-                    }
-                });
-                AlertDialog alert = builder.create();
-                alert.show();
                 return false;
             }
         });
 
-        head = TrieNode.createTrie(PoiManager.getSupportedPoiLists());
+        poiListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long id) {
+                int itemType = ExpandableListView.getPackedPositionType(id);
+
+                if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                    final int childPosition = ExpandableListView.getPackedPositionChild(id);
+                    final int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+                    CharSequence[] allItems = {getApplicationContext().getString(R.string.edit), getApplicationContext().getString(R.string.delete)};
+                    CharSequence[] editOnlyItems = {getApplicationContext().getString(R.string.edit)};
+
+                    final CharSequence[] items = groupPosition == 0 ? allItems : editOnlyItems;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(SelectPoiListActivity.this);
+                    builder.setTitle("Make your selection");
+                    builder.setItems(items, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int item) {
+                            String listName = groupPosition == 0 ? customListSearchResults.get(childPosition) : defaultListSearchResults.get(childPosition);
+                            if (item == 0) {
+                                Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
+                                intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, listName);
+                                myActivity.startActivity(intent);
+                            } else {
+                                // cannot delete default list - must be a custom list before we can enable delete
+                                if (groupPosition == 0) {
+                                    customListSearchResults.remove(childPosition);
+                                    PoiManager.removeList(listName);
+                                    TrieNode.deleteString(customListHead, listName);
+                                    updateListAdapter();
+                                }
+                            }
+                        }
+                    });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+
+                    return false;
+
+                } else if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+                    //do your per-group callback here
+                    return false;
+                }
+                return false;
+            }
+        });
+        poiListView.expandGroup(0);
+        poiListView.expandGroup(1);
+
+        customListHead = TrieNode.createTrie(PoiManager.getCustomPoiLists());
+        defaultListHead = TrieNode.createTrie(PoiManager.getDefaultPoiLists());
 
         final TextView searchTitle = (TextView)findViewById(R.id.search_title);
 
@@ -145,17 +190,22 @@ public class SelectPoiListActivity extends Activity {
             }
             @Override
             public void afterTextChanged(Editable editable) {
-                final TrieNode node = TrieNode.getCurrentPosition(head, searchBar.getText().toString());
+                final TrieNode node = TrieNode.getCurrentPosition(customListHead, searchBar.getText().toString());
+                final TrieNode defaultListNode = TrieNode.getCurrentPosition(defaultListHead, searchBar.getText().toString());
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (node == null) {
-                            searchResults.clear();
+                            customListSearchResults.clear();
                         } else {
-                            searchResults = TrieNode.getStringsWithCurrentPrefix(new ArrayList<String>(), node);
+                            customListSearchResults = TrieNode.getStringsWithCurrentPrefix(new ArrayList<String>(), node);
                         }
-                        listAdapter.updateData((ArrayList<String>) searchResults);
-                        listAdapter.notifyDataSetChanged();
+                        if (defaultListNode == null) {
+                            defaultListSearchResults.clear();
+                        } else {
+                            defaultListSearchResults = TrieNode.getStringsWithCurrentPrefix(new ArrayList<String>(), defaultListNode);
+                        }
+                        updateListAdapter();
                     }
                 });
             }
@@ -182,6 +232,7 @@ public class SelectPoiListActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         PoiManager.saveLocationsToFile(getApplicationContext());
+        finish();
     }
 
     @Override
@@ -193,10 +244,22 @@ public class SelectPoiListActivity extends Activity {
         }
     }
 
+    private void updateListAdapter() {
+        Collections.sort(customListSearchResults);
+        Collections.sort(defaultListSearchResults);
+        listAdapter.updateData(customListSearchResults, defaultListSearchResults);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                listAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
     private void setKeyboardShowing(EditText editText, boolean showing) {
         InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (showing) {
-            mgr.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+            mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_NOT_ALWAYS);
         } else {
             mgr.hideSoftInputFromWindow(editText.getWindowToken(), 0);
         }

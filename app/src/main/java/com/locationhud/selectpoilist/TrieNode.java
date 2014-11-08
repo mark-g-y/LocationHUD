@@ -69,4 +69,8 @@ public class TrieNode {
         }
         ptr.end.add(element);
     }
+
+    public static void deleteString(TrieNode head, String element) {
+        
+    }
 }
