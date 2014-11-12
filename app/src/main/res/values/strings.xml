@@ -15,7 +15,7 @@
     <string name="gps_not_found_title">GPS Not Found</string>
     <string name="gps_want_to_enable_message">Please enable your Location Services</string>
     <string name="ok">OK</string>
-    <string name="search_poi_list_title">Load Points of Interest</string>
+    <string name="search_poi_list_title">Points of Interest</string>
     <string name="search_poi_list_hint">Search</string>
     <string name="new_poi_list_title_prompt">Name of Points of Interest List</string>
     <string name="custom_list">Custom Lists</string>
