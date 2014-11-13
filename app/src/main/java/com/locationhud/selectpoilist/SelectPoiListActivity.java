@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -30,9 +32,10 @@ import java.util.Collections;
 /**
  * Created by Mark on 05/11/2014.
  */
-public class SelectPoiListActivity extends Activity {
+public class SelectPoiListActivity extends FragmentActivity implements EditPoiListOptionsDialogCallback {
 
-    private Activity myActivity;
+    private FragmentActivity myActivity;
+    private EditPoiListOptionsDialogCallback callback;
     private TrieNode customListHead;
     private TrieNode defaultListHead;
     private ArrayList<String> customListSearchResults = PoiManager.getCustomPoiLists();
@@ -43,6 +46,7 @@ public class SelectPoiListActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         myActivity = this;
+        callback = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_poi_list);
 
@@ -126,34 +130,38 @@ public class SelectPoiListActivity extends Activity {
                 if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
                     final int childPosition = ExpandableListView.getPackedPositionChild(id);
                     final int groupPosition = ExpandableListView.getPackedPositionGroup(id);
-                    CharSequence[] allItems = {getApplicationContext().getString(R.string.edit), getApplicationContext().getString(R.string.delete)};
-                    CharSequence[] editOnlyItems = {getApplicationContext().getString(R.string.edit)};
+                    String[] allItems = {getApplicationContext().getString(R.string.edit), getApplicationContext().getString(R.string.delete)};
+                    String[] editOnlyItems = {getApplicationContext().getString(R.string.edit)};
 
-                    final CharSequence[] items = groupPosition == 0 ? allItems : editOnlyItems;
-                    AlertDialog.Builder builder = new AlertDialog.Builder(SelectPoiListActivity.this);
-                    builder.setTitle("Make your selection");
-                    builder.setItems(items, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int item) {
-                            String listName = groupPosition == 0 ? customListSearchResults.get(childPosition) : defaultListSearchResults.get(childPosition);
-                            if (item == 0) {
-                                Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
-                                intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, listName);
-                                myActivity.startActivity(intent);
-                            } else {
-                                // cannot delete default list - must be a custom list before we can enable delete
-                                if (groupPosition == 0) {
-                                    customListSearchResults.remove(childPosition);
-                                    PoiManager.removeList(listName);
-                                    TrieNode.deleteString(customListHead, listName);
-                                    updateListAdapter();
-                                }
-                            }
-                        }
-                    });
-                    AlertDialog alert = builder.create();
-                    alert.show();
+                    final String[] items = groupPosition == 0 ? allItems : editOnlyItems;
+                    EditPoiListOptionsDialog poiListOptionsDialog = new EditPoiListOptionsDialog();
+                    String listName = groupPosition == 0 ? customListSearchResults.get(childPosition) : defaultListSearchResults.get(childPosition);
+                    poiListOptionsDialog.initiate(callback, listName, childPosition, items);
+                    poiListOptionsDialog.show(myActivity.getSupportFragmentManager(), "EDIT");
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(SelectPoiListActivity.this);
+//                    builder.setTitle(getString(R.string.edit_poi_options));
+//                    builder.setItems(items, new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int item) {
+//                            String listName = groupPosition == 0 ? customListSearchResults.get(childPosition) : defaultListSearchResults.get(childPosition);
+//                            if (item == 0) {
+//                                Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
+//                                intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, listName);
+//                                myActivity.startActivity(intent);
+//                            } else {
+//                                // cannot delete default list - must be a custom list before we can enable delete
+//                                if (groupPosition == 0) {
+//                                    customListSearchResults.remove(childPosition);
+//                                    PoiManager.removeList(listName);
+//                                    TrieNode.deleteString(customListHead, listName);
+//                                    updateListAdapter();
+//                                }
+//                            }
+//                        }
+//                    });
+//                    AlertDialog alert = builder.create();
+//                    alert.show();
 
-                    return false;
+                    return true;
 
                 } else if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
                     int groupPosition = ExpandableListView.getPackedPositionGroup(id);
@@ -266,4 +274,18 @@ public class SelectPoiListActivity extends Activity {
         }
     }
 
+    @Override
+    public void onEdit(String listName) {
+        Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
+        intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, listName);
+        myActivity.startActivity(intent);
+    }
+
+    @Override
+    public void onDelete(String listName, int childPosition) {
+        customListSearchResults.remove(childPosition);
+        PoiManager.removeList(listName);
+        TrieNode.deleteString(customListHead, listName);
+        updateListAdapter();
+    }
 }

@@ -1,5 +1,8 @@
 package com.locationhud.ui;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
@@ -40,5 +43,19 @@ public class UiUtility {
                 return false;
             }
         });
+    }
+
+    public static float convertDpToPixel(float dp, Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float px = dp * (metrics.densityDpi / 160f);
+        return px;
+    }
+
+    public static float convertPixelsToDp(float px, Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float dp = px / (metrics.densityDpi / 160f);
+        return dp;
     }
 }

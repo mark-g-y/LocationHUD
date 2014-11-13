@@ -24,5 +24,7 @@
     <string name="poi_name_exists_error">Error: this name already exists! Please pick something else.</string>
     <string name="prompt_to_select_poi">Search for a Location</string>
     <string name="error_get_lat_lng">Error: could not retrieve address location. Please try again</string>
+    <string name="edit_poi_options">Choose...</string>
+    <string name="prompt_enter_location_name">Enter the name of this location</string>
 
 </resources>

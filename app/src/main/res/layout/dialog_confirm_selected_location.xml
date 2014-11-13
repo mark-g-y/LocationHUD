@@ -8,7 +8,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter the name of this location"
+            android:hint="@string/prompt_enter_location_name"
             android:id="@+id/location_name_input"/>
 
     <include layout="@layout/view_dialog_button_row" />

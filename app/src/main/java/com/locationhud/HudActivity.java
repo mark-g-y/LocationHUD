@@ -240,7 +240,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         double scale = (MAX_VIEW_DISTANCE - distance) / MAX_VIEW_DISTANCE;
         scale = scale < 0 ? 0 : scale;
         LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
-                (int)convertDpToPixel((float)(300 * scale), this),
+                (int)UiUtility.convertDpToPixel((float)(300 * scale), this),
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
         LinearLayout layout = (LinearLayout)poiLayout.findViewById(R.id.layout_poi);
@@ -292,19 +292,5 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
 
     private boolean isPoiInView(double myDirection, double bearing, MapPoint poi) {
         return isPoiInHorizontalView(myDirection, bearing) && isPoiInVerticalView(compassDirectionManager.getLastLocation(), poi);
-    }
-
-    public static float convertDpToPixel(float dp, Context context){
-        Resources resources = context.getResources();
-        DisplayMetrics metrics = resources.getDisplayMetrics();
-        float px = dp * (metrics.densityDpi / 160f);
-        return px;
-    }
-
-    public static float convertPixelsToDp(float px, Context context){
-        Resources resources = context.getResources();
-        DisplayMetrics metrics = resources.getDisplayMetrics();
-        float dp = px / (metrics.densityDpi / 160f);
-        return dp;
     }
 }
