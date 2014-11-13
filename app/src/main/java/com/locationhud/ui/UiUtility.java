@@ -7,12 +7,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.locationhud.ui.buttons.PressedColourChangeViewTouchListener;
+
 /**
  * Created by Mark on 30/10/2014.
  */
 public class UiUtility {
     public static void setOnTouchColourChanges(final View v, final int colourOnUp, final int colourOnDown) {
-        v.setOnTouchListener(new View.OnTouchListener() {
+        v.setOnTouchListener(new PressedColourChangeViewTouchListener(v, colourOnUp, colourOnDown));
+    }
+    public static View.OnTouchListener getOnTouchListenerColourChanges(final View v, final int colourOnUp, final int colourOnDown) {
+        return new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
@@ -25,7 +30,7 @@ public class UiUtility {
                 }
                 return false;
             }
-        });
+        };
     }
 
     public static void setOnTouchImageChanges(final ImageButton button, final int imageOnUp, final int imageOnDown) {

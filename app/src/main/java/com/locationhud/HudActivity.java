@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -25,6 +26,10 @@ import com.locationhud.compassdirection.MapPoint;
 import com.locationhud.compassdirection.MyLocationManager;
 import com.locationhud.selectpoilist.SelectPoiListActivity;
 import com.locationhud.ui.UiUtility;
+import com.locationhud.ui.buttons.CustomButton;
+import com.locationhud.ui.buttons.PressedColourChangeViewTouchListener;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +41,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
 
     private static final int MAX_VIEW_DISTANCE = 300 * 1000;
 
+    private Activity myActivity;
     private Context context;
     private Camera camera;
     private CompassDirectionManager compassDirectionManager;
@@ -48,6 +54,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        myActivity = this;
         context = getApplicationContext();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hud);
@@ -58,15 +65,15 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         compassDirectionManager = new CompassDirectionManager(this, this);
         compassDirectionManager.onCreate();
 
-        ImageButton navigationMenuButton = (ImageButton)findViewById(R.id.navigation_menu);
-        navigationMenuButton.setOnClickListener(new View.OnClickListener() {
+        LinearLayout menuButton = (LinearLayout)findViewById(R.id.menu_button);
+        menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, SelectPoiListActivity.class);
                 startActivity(intent);
             }
         });
-        UiUtility.setOnTouchColourChanges(navigationMenuButton, android.R.color.transparent, R.color.item_pressed_translucent);
+        menuButton.setOnTouchListener(new PressedColourChangeViewTouchListener(menuButton, android.R.color.transparent, R.color.item_pressed_translucent));
     }
 
     @Override
@@ -81,6 +88,9 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         FrameLayout previewLayout = (FrameLayout) findViewById(R.id.camera_preview);
         previewLayout.removeAllViews();
         previewLayout.addView(preview);
+
+        TextView poiListName = (TextView)findViewById(R.id.poi_list_name);
+        poiListName.setText(PoiManager.getCurrentList());
 
         if (!MyLocationManager.isLocationServicesOn(this)) {
             MyLocationManager.promptUserTurnOnLocation(this);
@@ -240,7 +250,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         double scale = (MAX_VIEW_DISTANCE - distance) / MAX_VIEW_DISTANCE;
         scale = scale < 0 ? 0 : scale;
         LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
-                (int)UiUtility.convertDpToPixel((float)(300 * scale), this),
+                (int)UiUtility.convertDpToPixel((float) (300 * scale), this),
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
         LinearLayout layout = (LinearLayout)poiLayout.findViewById(R.id.layout_poi);

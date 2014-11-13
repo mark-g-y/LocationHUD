@@ -3,6 +3,7 @@ package com.locationhud.ui.buttons;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.locationhud.R;
 import com.locationhud.ui.UiUtility;
@@ -10,7 +11,7 @@ import com.locationhud.ui.UiUtility;
 /**
  * Created by Mark on 06/11/2014.
  */
-public class CustomButton extends Button {
+public class CustomButton extends TextView {
 
     public CustomButton(Context context) {
         super(context);
