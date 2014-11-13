@@ -150,21 +150,24 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
 
         addLocationsInCurrentListToMap();
 
-        ImageButton navigationArrowForwardButton = (ImageButton)findViewById(R.id.navigation_arrow_forward);
+        ImageButton navigationArrowForwardButton = (ImageButton)findViewById(R.id.navigation_arrow_back);
         navigationArrowForwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(myActivity, HudActivity.class);
-                startActivity(intent);
+                onBackPressed();
             }
         });
     }
 
     private void addMarker(LatLng latLong) {
+        addMarker("", latLong);
+    }
+
+    private void addMarker(String name, LatLng latLong) {
         lastAddedMarker = map.addMarker(new MarkerOptions().position(latLong).draggable(true));
         lastLongClickLocation = latLong;
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLong, DEFAULT_MAP_ZOOM_LEVEL));
-        displayEditMarkerDialog(lastAddedMarker, "", myActivity.getString(R.string.save), myActivity.getString(R.string.cancel));
+        displayEditMarkerDialog(lastAddedMarker, name, myActivity.getString(R.string.save), myActivity.getString(R.string.cancel));
     }
 
     private void displayEditMarkerDialog(Marker marker, String name, String yesButtonText, String noButtonText) {
@@ -263,8 +266,9 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     }
 
     private void selectAddressToAdd(PlacesAutoCompleteAdapter placesAutoCompleteAdapter, int position) {
+        String name = placesAutoCompleteAdapter.getItem(position);
         String placeId = placesAutoCompleteAdapter.getPlaceId(position);
-        LatitudeLongitudeRetrievalTask task = new LatitudeLongitudeRetrievalTask(callback, placeId);
+        LatitudeLongitudeRetrievalTask task = new LatitudeLongitudeRetrievalTask(callback, name, placeId);
         task.execute();
     }
 
@@ -283,16 +287,16 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                     }
                 });
             }
-        }, 150);
+        }, 100);
     }
 
     @Override
-    public void onLatitudeLongitudeFound(LatLng latLng) {
+    public void onLatitudeLongitudeFound(String name, LatLng latLng) {
         if (latLng != null) {
             AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.prompt_to_select_poi);
             autoCompView.setText("");
-            addMarker(latLng);
-
+            name = name.indexOf(',') >= 0 ? name.substring(0, name.indexOf(',')) : name;
+            addMarker(name, latLng);
         } else {
             Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.error_get_lat_lng), Toast.LENGTH_SHORT).show();
         }

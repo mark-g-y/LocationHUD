@@ -46,6 +46,7 @@ public class ConfirmSelectedLocationDialog extends DialogFragment {
 
         EditText locationNameInput = (EditText)rootView.findViewById(R.id.location_name_input);
         locationNameInput.setText(name);
+        locationNameInput.selectAll();
 
         Button noButton = (Button)rootView.findViewById(R.id.cancel_button);
         noButton.setText(noButtonText);

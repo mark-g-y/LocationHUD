@@ -26,10 +26,12 @@ public class LatitudeLongitudeRetrievalTask extends AsyncTask<Void, Void, Void> 
     private static final String LOG_TAG = "PlacesDetailRetrievalTask";
 
     LatitudeLongitudeFoundCallback callback;
+    private String name;
     private String placeId;
     private LatLng latlong;
 
-    public LatitudeLongitudeRetrievalTask(LatitudeLongitudeFoundCallback callback, String placeId) {
+    public LatitudeLongitudeRetrievalTask(LatitudeLongitudeFoundCallback callback, String name, String placeId) {
+        this.name = name;
         this.callback = callback;
         this.placeId = placeId;
     }
@@ -42,7 +44,7 @@ public class LatitudeLongitudeRetrievalTask extends AsyncTask<Void, Void, Void> 
 
     @Override
     protected void onPostExecute(Void result) {
-        callback.onLatitudeLongitudeFound(latlong);
+        callback.onLatitudeLongitudeFound(name, latlong);
     }
 
     public LatLng getLatitudeLongitude(String placeId) {

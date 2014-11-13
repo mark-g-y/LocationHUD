@@ -21,21 +21,8 @@
         android:background="@color/white_darker_translucent"
         >
 
-        <AutoCompleteTextView
-            android:id="@+id/prompt_to_select_poi"
-            android:hint="@string/prompt_to_select_poi"
-            android:textColor="@android:color/black"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            />
-
-        <ImageButton
-            android:id="@+id/navigation_arrow_forward"
+        <com.locationhud.ui.buttons.CustomImageButton
+            android:id="@+id/navigation_arrow_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -43,7 +30,20 @@
             android:gravity="center_vertical|right"
             android:padding="15dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/ic_navigation_arrow_forward"/>
+            android:src="@drawable/ic_navigation_arrow_back"/>
+
+        <AutoCompleteTextView
+            android:id="@+id/prompt_to_select_poi"
+            android:hint="@string/prompt_to_select_poi"
+            android:textColor="@android:color/black"
+            android:gravity="center_vertical|left"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            />
 
     </LinearLayout>
 
