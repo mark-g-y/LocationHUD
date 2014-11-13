@@ -113,6 +113,7 @@ public class SelectPoiListActivity extends Activity {
                         listAdapter.notifyDataSetChanged();
                     }
                 });
+                onBackPressed();
                 return false;
             }
         });
