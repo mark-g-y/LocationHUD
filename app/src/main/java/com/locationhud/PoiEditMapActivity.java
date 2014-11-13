@@ -47,6 +47,8 @@ import java.util.Iterator;
 public class PoiEditMapActivity extends FragmentActivity implements MyLocationFoundCallback,
         ConfirmSelectedLocationDialogCallback, LatitudeLongitudeFoundCallback {
 
+    private static final int DEFAULT_MAP_ZOOM_LEVEL = 10;
+
     private Activity myActivity;
     private LatitudeLongitudeFoundCallback callback;
     private MyLocationManager locationManager;
@@ -161,6 +163,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     private void addMarker(LatLng latLong) {
         lastAddedMarker = map.addMarker(new MarkerOptions().position(latLong).draggable(true));
         lastLongClickLocation = latLong;
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLong, DEFAULT_MAP_ZOOM_LEVEL));
         displayEditMarkerDialog(lastAddedMarker, "", myActivity.getString(R.string.save), myActivity.getString(R.string.cancel));
     }
 

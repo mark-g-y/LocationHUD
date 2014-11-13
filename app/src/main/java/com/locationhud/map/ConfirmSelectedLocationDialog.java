@@ -27,6 +27,7 @@ public class ConfirmSelectedLocationDialog extends DialogFragment {
 
     public ConfirmSelectedLocationDialog() {
         thisFragment = this;
+        setRetainInstance(true);
     }
 
     public void initiate(ConfirmSelectedLocationDialogCallback confirmSelectedLocationDialogCallback, LatLng location, String name, String yesButtonText, String noButtonText) {
@@ -86,5 +87,13 @@ public class ConfirmSelectedLocationDialog extends DialogFragment {
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (getDialog() != null && getRetainInstance()) {
+            getDialog().setDismissMessage(null);
+        }
+        super.onDestroyView();
     }
 }
