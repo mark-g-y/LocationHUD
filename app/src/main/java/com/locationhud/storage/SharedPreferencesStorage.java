@@ -25,6 +25,28 @@ public class SharedPreferencesStorage {
         private static final String KEY_ZOOM = "zoom";
     }
 
+    public static class PoiListGroupStorage {
+        private static final String KEY = "poi_list_group";
+        private static final String KEY_CUSTOM_GROUP_EXPANDED = "custom_group_expanded";
+        private static final String KEY_DEFAULT_GROUP_EXPANDED = "default_group_expanded";
+    }
+
+    public static void saveExpandedGroups(Context context, boolean[] groups) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PoiListGroupStorage.KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putBoolean(PoiListGroupStorage.KEY_CUSTOM_GROUP_EXPANDED, groups[0]);
+        sharedPreferencesEditor.putBoolean(PoiListGroupStorage.KEY_DEFAULT_GROUP_EXPANDED, groups[1]);
+        sharedPreferencesEditor.commit();
+    }
+
+    public static boolean[] getExpandedGroups(Context context) {
+        boolean[] expanded = new boolean[2];
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PoiListGroupStorage.KEY, Context.MODE_PRIVATE);
+        expanded[0] = sharedPreferences.getBoolean(PoiListGroupStorage.KEY_CUSTOM_GROUP_EXPANDED, true);
+        expanded[1] = sharedPreferences.getBoolean(PoiListGroupStorage.KEY_DEFAULT_GROUP_EXPANDED, true);
+        return expanded;
+    }
+
     public static void setInstructionsRead(Context context, boolean b) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(GeneralSettingsStorage.KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();

@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.locationhud.PoiEditMapActivity;
 import com.locationhud.PoiManager;
 import com.locationhud.R;
+import com.locationhud.storage.SharedPreferencesStorage;
 import com.locationhud.utility.ActivityResultCodes;
 import com.locationhud.utility.IntentTransferCodes;
 
@@ -138,28 +139,6 @@ public class SelectPoiListActivity extends FragmentActivity implements EditPoiLi
                     String listName = groupPosition == 0 ? customListSearchResults.get(childPosition) : defaultListSearchResults.get(childPosition);
                     poiListOptionsDialog.initiate(callback, listName, childPosition, items);
                     poiListOptionsDialog.show(myActivity.getSupportFragmentManager(), "EDIT");
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(SelectPoiListActivity.this);
-//                    builder.setTitle(getString(R.string.edit_poi_options));
-//                    builder.setItems(items, new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int item) {
-//                            String listName = groupPosition == 0 ? customListSearchResults.get(childPosition) : defaultListSearchResults.get(childPosition);
-//                            if (item == 0) {
-//                                Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
-//                                intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, listName);
-//                                myActivity.startActivity(intent);
-//                            } else {
-//                                // cannot delete default list - must be a custom list before we can enable delete
-//                                if (groupPosition == 0) {
-//                                    customListSearchResults.remove(childPosition);
-//                                    PoiManager.removeList(listName);
-//                                    TrieNode.deleteString(customListHead, listName);
-//                                    updateListAdapter();
-//                                }
-//                            }
-//                        }
-//                    });
-//                    AlertDialog alert = builder.create();
-//                    alert.show();
 
                     return true;
 
@@ -171,8 +150,12 @@ public class SelectPoiListActivity extends FragmentActivity implements EditPoiLi
                 return false;
             }
         });
-        poiListView.expandGroup(0);
-        poiListView.expandGroup(1);
+        boolean[] expanded = SharedPreferencesStorage.getExpandedGroups(getApplicationContext());
+        for (int i = 0; i < expanded.length; i++) {
+            if (expanded[i]) {
+                poiListView.expandGroup(i);
+            }
+        }
 
         customListHead = TrieNode.createTrie(PoiManager.getCustomPoiLists());
         defaultListHead = TrieNode.createTrie(PoiManager.getDefaultPoiLists());
@@ -241,7 +224,16 @@ public class SelectPoiListActivity extends FragmentActivity implements EditPoiLi
     protected void onDestroy() {
         super.onDestroy();
         PoiManager.saveLocationsToFile(getApplicationContext());
+        saveExpandedListViewState();
         finish();
+    }
+
+    private void saveExpandedListViewState() {
+        final ExpandableListView poiListView = (ExpandableListView)findViewById(R.id.poi_expandable_list_view);
+        boolean[] expanded = new boolean[2];
+        expanded[0] = poiListView.isGroupExpanded(0);
+        expanded[1] = poiListView.isGroupExpanded(1);
+        SharedPreferencesStorage.saveExpandedGroups(getApplicationContext(), expanded);
     }
 
     @Override
