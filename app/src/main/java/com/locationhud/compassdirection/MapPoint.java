@@ -63,4 +63,9 @@ public class MapPoint implements AltitudeFoundCallback {
     public void onAltitudeFound(double altitude) {
         this.altitude = altitude;
     }
+
+    @Override
+    public String toString() {
+        return title + "|" + latitude + "|" + longitude + "|" + altitude;
+    }
 }

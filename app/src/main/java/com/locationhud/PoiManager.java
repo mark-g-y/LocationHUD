@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Mark on 23/10/2014.
@@ -93,7 +94,8 @@ public class PoiManager {
         try {
             String jsonPoi = FileStorage.readFromFile(context);
             if (jsonPoi != null) {
-                poiMap = JsonFactory.decodeJsonForPois(jsonPoi);
+                //poiMap.putAll(JsonFactory.decodeJsonForPois(jsonPoi));
+                poiMap = mergeHashMaps(poiMap, JsonFactory.decodeJsonForPois(jsonPoi));
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -107,5 +109,32 @@ public class PoiManager {
     public static void removeList(String listName) {
         poiMap.remove(listName);
         currentList = "";
+    }
+
+    private static HashMap<String, ArrayList<MapPoint>> mergeHashMaps(HashMap<String, ArrayList<MapPoint>> m1, HashMap<String, ArrayList<MapPoint>> m2) {
+        Iterator<Map.Entry<String, ArrayList<MapPoint>>> iterator = m1.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, ArrayList<MapPoint>> entry = iterator.next();
+            String key = entry.getKey();
+            if (m2.get(key) != null) {
+                m1.put(key, mergeArray(m1.get(key), m2.get(key)));
+                m2.remove(key);
+            }
+        }
+        m1.putAll(m2);
+        return m1;
+    }
+
+    private static ArrayList<MapPoint> mergeArray(ArrayList<MapPoint> l1, ArrayList<MapPoint> l2) {
+        HashMap<String, MapPoint> m1 = new HashMap<String, MapPoint>();
+        for (MapPoint mp : l1) {
+            m1.put(mp.toString(), mp);
+        }
+        for (MapPoint mp : l2) {
+            if (m1.get(mp.toString()) == null) {
+                l1.add(mp);
+            }
+        }
+        return l1;
     }
 }
