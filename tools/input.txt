@@ -1,0 +1,37 @@
+/|\Mission Peak
+San Francisco
+37.808305
+-122.409104
+16
+
+Hanger 1
+37.412818
+-122.054060
+31.7
+
+San Jose Intl. Airport
+37.363968
+-121.928992
+13.575
+
+Calaveras Reservoir
+37.473597
+-121.819225
+223.693
+
+/|\San Jose
+San Francisco
+37.808305
+-122.409104
+16
+
+/|\CN Tower, Toronto
+Pearson Intl. Airport
+43.677660
+-79.624852
+166.842
+
+Toronto Islands
+43.620756
+-79.375470
+77.512

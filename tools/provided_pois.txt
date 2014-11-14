@@ -1,0 +1,59 @@
+[
+    {
+        "list": "Mission Peak",
+        "poi_list": [
+            {
+                "altitude": "16",
+                "latitude": "37.808305",
+                "longitude": "-122.409104",
+                "title": "San Francisco"
+            },
+            {
+                "altitude": "31.7",
+                "latitude": "37.412818",
+                "longitude": "-122.054060",
+                "title": "Hanger 1"
+            },
+            {
+                "altitude": "13.575",
+                "latitude": "37.363968",
+                "longitude": "-121.928992",
+                "title": "San Jose Intl. Airport"
+            },
+            {
+                "altitude": "223.693",
+                "latitude": "37.473597",
+                "longitude": "-121.819225",
+                "title": "Calaveras Reservoir"
+            }
+        ]
+    },
+    {
+        "list": "San Jose",
+        "poi_list": [
+            {
+                "altitude": "16",
+                "latitude": "37.808305",
+                "longitude": "-122.409104",
+                "title": "San Francisco"
+            }
+        ]
+    },
+    {
+        "list": "CN Tower, Toronto",
+        "poi_list": [
+            {
+                "altitude": "166.842",
+                "latitude": "43.677660",
+                "longitude": "-79.624852",
+                "title": "Pearson Intl. Airport"
+            },
+            {
+                "altitude": "77.512",
+                "latitude": "43.620756",
+                "longitude": "-79.375470",
+                "title": "Toronto Islands"
+            }
+        ]
+    }
+]
