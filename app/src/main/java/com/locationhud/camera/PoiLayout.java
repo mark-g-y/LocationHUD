@@ -14,12 +14,16 @@ import com.locationhud.compassdirection.MapPoint;
 public class PoiLayout extends LinearLayout {
 
     private MapPoint poi;
+    private LinearLayout layoutPoi;
+    private boolean isNormalBackground = true;
 
     public PoiLayout(Context context, MapPoint poi) {
         super(context);
 
         LayoutInflater  inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.layout_poi, this, true);
+
+        layoutPoi = (LinearLayout)findViewById(R.id.layout_poi);
 
         this.poi = poi;
         TextView titleTextView = (TextView)findViewById(R.id.title_view);
@@ -51,5 +55,15 @@ public class PoiLayout extends LinearLayout {
 
     private String convertDoubleForDisplay(double d, int numDecimals) {
         return Double.toString(Math.round(Math.pow(10, numDecimals) * d) / Math.pow(10, numDecimals));
+    }
+
+    public void toggleTranslucentLevel() {
+        if (isNormalBackground) {
+            layoutPoi.setBackgroundColor(getResources().getColor(R.color.white_more_translucent));
+            isNormalBackground = false;
+        } else {
+            layoutPoi.setBackgroundColor(getResources().getColor(R.color.white_translucent));
+            isNormalBackground = true;
+        }
     }
 }

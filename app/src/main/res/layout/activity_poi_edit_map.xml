@@ -18,7 +18,7 @@
         android:layout_marginRight="15dp"
         android:layout_alignParentTop="true"
         android:orientation="horizontal"
-        android:background="@color/white_darker_translucent"
+        android:background="@color/white_less_translucent"
         >
 
         <com.locationhud.ui.buttons.CustomImageButton

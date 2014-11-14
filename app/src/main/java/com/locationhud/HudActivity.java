@@ -138,8 +138,20 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
             return;
         }
         for (int i = 0; i < poi.size(); i++) {
-            PoiLayout poiLayout = new PoiLayout(getApplicationContext(), poi.get(i));
+            final int index = i;
+            final PoiLayout poiLayout = new PoiLayout(getApplicationContext(), poi.get(i));
             poiLayout.setVisibility(View.GONE);
+            poiLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    poiLayout.toggleTranslucentLevel();
+                    for (int m = 0; m < poi.size(); m++) {
+                        if (m != index) {
+                            poiLayouts.get(poi.get(m)).bringToFront();
+                        }
+                    }
+                }
+            });
             poiLayouts.put(poi.get(i), poiLayout);
             layoutHudActivity.addView(poiLayout);
         }
