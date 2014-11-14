@@ -30,13 +30,10 @@ public class PoiLayout extends LinearLayout {
         titleTextView.setText(poi.getTitle());
 
         TextView locationTextView = (TextView)findViewById(R.id.location_view);
-        //locationTextView.setText(convertDoubleForDisplay(poi.getLatitude()) + ", " + convertDoubleForDisplay(poi.getLongitude()) + ", " + convertDoubleForDisplay(poi.getAltitude()));
         locationTextView.setText(convertDoubleForDisplay(poi.getAltitude()) + "m");
     }
 
     public void updateDistanceToPoi(double distance) {
-        //TextView titleTextView = (TextView) findViewById(R.id.title_view);
-        //titleTextView.setText(poi.getTitle() + " | " + convertDistanceForDisplay(distance));
         TextView locationTextView = (TextView)findViewById(R.id.location_view);
         locationTextView.setText("Dist. " + convertDistanceForDisplay(distance) + " | Alt. " + convertDoubleForDisplay(poi.getAltitude()) + "m");
     }
@@ -60,10 +57,19 @@ public class PoiLayout extends LinearLayout {
     public void toggleTranslucentLevel() {
         if (isNormalBackground) {
             layoutPoi.setBackgroundColor(getResources().getColor(R.color.white_more_translucent));
+            setAllTextViewColor(getResources().getColor(R.color.black_more_translucent));
             isNormalBackground = false;
         } else {
             layoutPoi.setBackgroundColor(getResources().getColor(R.color.white_translucent));
+            setAllTextViewColor(getResources().getColor(android.R.color.black));
             isNormalBackground = true;
         }
+    }
+
+    public void setAllTextViewColor(int color) {
+        TextView titleTextView = (TextView)findViewById(R.id.title_view);
+        titleTextView.setTextColor(color);
+        TextView locationTextView = (TextView)findViewById(R.id.location_view);
+        locationTextView.setTextColor(color);
     }
 }

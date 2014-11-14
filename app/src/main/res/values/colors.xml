@@ -3,6 +3,7 @@
     <color name="white_translucent">#80FFFFFF</color>
     <color name="white_more_translucent">#10FFFFFF</color>
     <color name="white_less_translucent">#BBFFFFFF</color>
+    <color name="black_more_translucent">#40000000</color>
     <color name="holo_blue">#007AFF</color>
     <color name="holo_blue_bright">#ff00ddff</color>
     <color name="holo_blue_dark">#ff0099cc</color>
