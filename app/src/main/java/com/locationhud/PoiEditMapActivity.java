@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -95,9 +96,9 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         });
 
         boolean instructionsViewed = SharedPreferencesStorage.isInstructionsRead(getApplicationContext());
-        if (instructionsViewed) {
-            hideInstructions();
-        } else {
+        if (!instructionsViewed) {
+            LinearLayout instructionsView = (LinearLayout)findViewById(R.id.edit_poi_map_instructions);
+            instructionsView.setVisibility(View.VISIBLE);
             final Button confirmInstructionsReadButton = (Button)findViewById(R.id.button_instructions_read);
             confirmInstructionsReadButton.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -55,6 +55,7 @@
         android:layout_marginRight="15dp"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
+        android:visibility="gone"
         android:background="@android:color/white"
         >
         <TextView
