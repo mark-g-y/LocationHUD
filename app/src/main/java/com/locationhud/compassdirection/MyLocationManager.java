@@ -10,6 +10,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -74,7 +75,12 @@ public class MyLocationManager implements GooglePlayServicesClient.ConnectionCal
 
     public Location getLastLocation() {
         if (isLocationConnected) {
-            return locationClient.getLastLocation();
+            Location location = locationClient.getLastLocation();
+            //Converter converter = Converter.getInstance();
+            //double altitude = converter.getHeightFromLatitudeAndLongitude(location.getLatitude(), location.getLongitude());
+            //location.setAltitude(altitude);
+            //Log.d("ASDFASDFDSFFOO", "" + altitude);
+            return location;
         }
         return null;
     }

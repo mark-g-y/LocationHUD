@@ -88,7 +88,8 @@ public class CompassDirectionManager implements GooglePlayServicesClient.Connect
     public static double getAngleBetweenAltitudes(Location myLocation, MapPoint poi) {
         double distance = getDistance(myLocation, poi);
         double heightDiff = poi.getAltitude() - myLocation.getAltitude();
-        return distance == 0 ? 90 : Math.toDegrees(Math.atan(heightDiff / distance));
+        // if we're really close, we want to direct the user's gaze downwards to indicate the POI is there
+        return distance < 100 ? -Math.abs(Math.toDegrees(Math.atan(heightDiff / distance))) : Math.toDegrees(Math.atan(heightDiff / distance));
     }
 
     public double getTiltAngle() {

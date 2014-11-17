@@ -193,8 +193,6 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         double thetaH = 2d * Math.atan(aspect * Math.tan(thetaV / 2));
         verticalViewAngle = Math.toDegrees(2d * Math.atan(100d * Math.tan(thetaV / 2d) / zoom));
         horizontalViewAngle = 0.8 * Math.toDegrees(2d * Math.atan(100d * Math.tan(thetaH / 2d) / zoom));
-//        verticalViewAngle = (Math.toDegrees(p.getVerticalViewAngle()) % 360) / 2;
-//        horizontalViewAngle = Math.toDegrees(p.getHorizontalViewAngle()) % 360;
         // must swap the variables because Android thinks they're reversed
         horizontalViewAngle = verticalViewAngle + horizontalViewAngle;
         verticalViewAngle = horizontalViewAngle - verticalViewAngle;
