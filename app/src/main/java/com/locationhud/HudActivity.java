@@ -25,7 +25,6 @@ import com.locationhud.compassdirection.CompassDirectionManager;
 import com.locationhud.compassdirection.MapPoint;
 import com.locationhud.compassdirection.MyLocationManager;
 import com.locationhud.selectpoilist.SelectPoiListActivity;
-import com.locationhud.services.LocationScanningService;
 import com.locationhud.ui.UiUtility;
 import com.locationhud.ui.buttons.CustomButton;
 import com.locationhud.ui.buttons.PressedColourChangeViewTouchListener;
@@ -61,9 +60,6 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         setContentView(R.layout.activity_hud);
         PoiManager.readLocationsFromFile(getApplicationContext());
 
-        Intent intent = new Intent(getApplicationContext(), LocationScanningService.class);
-        startService(intent);
-
         loadPoiLayouts();
 
         compassDirectionManager = new CompassDirectionManager(this, this);
@@ -73,8 +69,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, SelectPoiListActivity.class);
-                startActivity(intent);
+                onBackPressed();
             }
         });
         menuButton.setOnTouchListener(new PressedColourChangeViewTouchListener(menuButton, android.R.color.transparent, R.color.item_pressed_translucent));

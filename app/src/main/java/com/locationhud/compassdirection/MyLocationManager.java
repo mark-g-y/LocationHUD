@@ -32,10 +32,6 @@ public class MyLocationManager implements GooglePlayServicesClient.ConnectionCal
     private boolean isLocationServicesOn = false;
     private int timeBeforeLocationUpdate = -1;
 
-    public MyLocationManager(Activity activity) {
-        this.activity = activity;
-    }
-
     public MyLocationManager(Activity activity, MyLocationFoundCallback myLocationFoundCallback, int timeBeforeLocationUpdate) {
         this.activity = activity;
         this.myLocationFoundCallback = myLocationFoundCallback;
@@ -54,7 +50,7 @@ public class MyLocationManager implements GooglePlayServicesClient.ConnectionCal
         if (isLocationServicesOn) {
             locationClient.connect();
             if(timeBeforeLocationUpdate > 0) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, this);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, timeBeforeLocationUpdate, 0, this);
             }
         }
     }

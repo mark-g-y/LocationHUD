@@ -9,14 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.locationhud.ui.buttons.CustomImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:padding="15dp"
-            android:src="@drawable/ic_navigation_arrow_back"
-            android:id="@+id/navigation_arrow_back"/>
-
         <TextView
             android:id="@+id/search_title"
             android:text="@string/search_poi_list_title"
@@ -25,13 +17,14 @@
             android:layout_toLeftOf="@+id/search"
             android:layout_toRightOf="@id/navigation_arrow_back"
             android:layout_centerVertical="true"
+            android:paddingLeft="10dp"
             android:textSize="16sp"/>
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@+id/search"
-            android:layout_toRightOf="@id/navigation_arrow_back"
+            android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:hint="@string/search_poi_list_hint"
             android:visibility="gone"

@@ -111,12 +111,6 @@ public class PoiListAdapter extends BaseExpandableListAdapter {
 
         viewHolder.title.setText(listName);
 
-        if (listName.equals(PoiManager.getCurrentList())) {
-            viewHolder.title.setTypeface(null, Typeface.BOLD);
-        } else {
-            viewHolder.title.setTypeface(null, Typeface.NORMAL);
-        }
-
         return view;
     }
 

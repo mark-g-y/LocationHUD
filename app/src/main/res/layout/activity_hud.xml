@@ -19,11 +19,11 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/navigation_menu"
+            android:id="@+id/navigation_arrow_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="15dp"
-            android:src="@drawable/ic_navigation_menu"/>
+            android:src="@drawable/ic_navigation_arrow_back"/>
 
         <TextView
             android:id="@+id/poi_list_name"

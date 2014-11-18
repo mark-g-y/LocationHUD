@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.locationhud.HudActivity;
 import com.locationhud.PoiEditMapActivity;
 import com.locationhud.PoiManager;
 import com.locationhud.R;
@@ -50,14 +51,6 @@ public class SelectPoiListActivity extends FragmentActivity implements EditPoiLi
         callback = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_poi_list);
-
-        ImageButton backButton = (ImageButton)findViewById(R.id.navigation_arrow_back);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
 
         ImageButton newListButton = (ImageButton)findViewById(R.id.add_new_list);
         newListButton.setOnClickListener(new View.OnClickListener() {
@@ -118,7 +111,8 @@ public class SelectPoiListActivity extends FragmentActivity implements EditPoiLi
                         listAdapter.notifyDataSetChanged();
                     }
                 });
-                onBackPressed();
+                Intent intent = new Intent(myActivity, HudActivity.class);
+                startActivity(intent);
                 return false;
             }
         });
