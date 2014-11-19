@@ -25,6 +25,7 @@ import com.locationhud.PoiEditMapActivity;
 import com.locationhud.PoiManager;
 import com.locationhud.R;
 import com.locationhud.storage.SharedPreferencesStorage;
+import com.locationhud.ui.buttons.CustomButton;
 import com.locationhud.utility.ActivityResultCodes;
 import com.locationhud.utility.IntentTransferCodes;
 
@@ -210,6 +211,16 @@ public class SelectPoiListActivity extends FragmentActivity implements EditPoiLi
                     searchActionButton.setVisibility(View.VISIBLE);
                     setKeyboardShowing(searchBar, false);
                 }
+            }
+        });
+
+        CustomButton automatedPoiGenerateButton = (CustomButton)findViewById(R.id.automatic_generate_poi_button);
+        automatedPoiGenerateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(myActivity, HudActivity.class);
+                intent.putExtra(IntentTransferCodes.IS_AUTOMATED_POI_RETRIEVAL, true);
+                startActivity(intent);
             }
         });
     }

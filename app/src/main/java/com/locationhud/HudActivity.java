@@ -1,7 +1,9 @@
 package com.locationhud;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.hardware.Camera;
@@ -24,10 +26,13 @@ import com.locationhud.compassdirection.CompassDirectionFoundCallback;
 import com.locationhud.compassdirection.CompassDirectionManager;
 import com.locationhud.compassdirection.MapPoint;
 import com.locationhud.compassdirection.MyLocationManager;
+import com.locationhud.googleapi.retrievealtitude.AltitudeFoundCallback;
+import com.locationhud.googleapi.retrievealtitude.RetrieveAltitudeTask;
 import com.locationhud.selectpoilist.SelectPoiListActivity;
 import com.locationhud.ui.UiUtility;
 import com.locationhud.ui.buttons.CustomButton;
 import com.locationhud.ui.buttons.PressedColourChangeViewTouchListener;
+import com.locationhud.utility.IntentTransferCodes;
 
 import org.w3c.dom.Text;
 
@@ -37,9 +42,12 @@ import java.util.HashMap;
 /**
  * Created by Mark on 19/10/2014.
  */
-public class HudActivity extends Activity implements CompassDirectionFoundCallback {
+public class HudActivity extends Activity implements CompassDirectionFoundCallback,
+        AltitudeFoundCallback
+{
 
     private static final int MAX_VIEW_DISTANCE = 300 * 1000;
+    private static final double NO_ALTITUDE = -999;
 
     private Activity myActivity;
     private Context context;
@@ -49,8 +57,14 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
     private ArrayList<MapPoint> poi = PoiManager.getList(currentList);
     private HashMap<MapPoint, PoiLayout> poiLayouts = new HashMap<MapPoint, PoiLayout>();
 
+    private ProgressDialog loadingDialog;
+    private boolean firstTime = true;
+    private boolean isAutomatedPoiRetrieval = false;
+
     private double verticalViewAngle;
     private double horizontalViewAngle;
+
+    private double myAltitude = NO_ALTITUDE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +72,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         context = getApplicationContext();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hud);
+        isAutomatedPoiRetrieval = getIntent().getBooleanExtra(IntentTransferCodes.IS_AUTOMATED_POI_RETRIEVAL, false);
         PoiManager.readLocationsFromFile(getApplicationContext());
 
         loadPoiLayouts();
@@ -80,6 +95,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         super.onResume();
         compassDirectionManager.onResume();
         camera = getCamera();
+        firstTime = true;
         setCameraDisplayOrientation(this, Camera.CameraInfo.CAMERA_FACING_BACK, camera);
         initiateCameraViewport(camera);
 
@@ -93,6 +109,14 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
 
         if (!MyLocationManager.isLocationServicesOn(this)) {
             MyLocationManager.promptUserTurnOnLocation(this);
+        } else {
+            loadingDialog = ProgressDialog.show(this, "", getResources().getString(R.string.loading), true, true);
+            loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialogInterface) {
+                    onBackPressed();
+                }
+            });
         }
 
         loadPoiLayouts();
@@ -115,7 +139,6 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         super.onPause();
         camera.release();
         compassDirectionManager.onPause();
-
     }
 
     @Override
@@ -212,6 +235,13 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
     @Override
     public void onCompassDirectionFound(final double azimuth) {
         Location location = compassDirectionManager.getLastLocation();
+        if (firstTime) {
+            getAltitudeFromServer(location);
+            if (isAutomatedPoiRetrieval) {
+                getPoisFromServer(location);
+            }
+            firstTime = false;
+        }
         if (location != null) {
             for (int i = 0; i < poi.size(); i++) {
                 double bearing = CompassDirectionManager.getAngleBetweenCoordinates(location.getLatitude(), location.getLongitude(), poi.get(i).getLatitude(), poi.get(i).getLongitude());
@@ -222,6 +252,15 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
                 }
             }
         }
+    }
+
+    private void getPoisFromServer(Location location) {
+
+    }
+
+    private void getAltitudeFromServer(Location location) {
+        RetrieveAltitudeTask task = new RetrieveAltitudeTask(this, location.getLatitude(), location.getLongitude());
+        task.execute();
     }
 
     private void positionPoi(final MapPoint poi, double azimuth, double bearing, double tiltAngle, double altitudeAngle) {
@@ -241,14 +280,14 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
                 if (poiLayout == null) {
                     return;
                 }
-                setPoiViewSizeByDistance(poiLayout, CompassDirectionManager.getDistance(compassDirectionManager.getLastLocation(), poi));
+                setPoiViewSizeByDistance(poiLayout, CompassDirectionManager.getDistance(getLastLocation(), poi));
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                         RelativeLayout.LayoutParams.WRAP_CONTENT,
                         RelativeLayout.LayoutParams.WRAP_CONTENT
                 );
                 params.setMargins((int)(horizontalWidth + width / 2 - poiLayout.getWidth() / 2), (int)(-verticalWidth + height / 2 - poiLayout.getHeight() / 2), 0, 0);
                 poiLayout.setLayoutParams(params);
-                poiLayout.updateDistanceToPoi(CompassDirectionManager.getDistance(compassDirectionManager.getLastLocation(), poi));
+                poiLayout.updateDistanceToPoi(CompassDirectionManager.getDistance(getLastLocation(), poi));
                 poiLayout.setVisibility(View.VISIBLE);
             }
         });
@@ -310,6 +349,22 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
     }
 
     private boolean isPoiInView(double myDirection, double bearing, MapPoint poi) {
-        return isPoiInHorizontalView(myDirection, bearing) && isPoiInVerticalView(compassDirectionManager.getLastLocation(), poi);
+        return isPoiInHorizontalView(myDirection, bearing) && isPoiInVerticalView(getLastLocation(), poi);
+    }
+
+    private Location getLastLocation() {
+        Location location = compassDirectionManager.getLastLocation();
+        if (location != null) {
+            if (myAltitude != NO_ALTITUDE) {
+                location.setAltitude(myAltitude);
+            }
+        }
+        return location;
+    }
+
+    @Override
+    public void onAltitudeFound(double altitude) {
+        myAltitude = altitude;
+        loadingDialog.dismiss();
     }
 }

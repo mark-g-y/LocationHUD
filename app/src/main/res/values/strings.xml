@@ -26,5 +26,7 @@
     <string name="error_get_lat_lng">Error: could not retrieve address location. Please try again</string>
     <string name="edit_poi_options">Choose...</string>
     <string name="prompt_enter_location_name">Enter the name of this location</string>
+    <string name="loading">Loading...</string>
+    <string name="autogenerate_poi_prompt">Generate List for Me!</string>
 
 </resources>
