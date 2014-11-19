@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
@@ -18,51 +19,35 @@ import java.util.Collections;
 /**
  * Created by Mark on 05/11/2014.
  */
-public class PoiListAdapter extends BaseExpandableListAdapter {
+public class PoiListAdapter extends BaseAdapter {
 
     private Context context;
     private ArrayList<String> poiLists;
-    private ArrayList<String> defaultPoiLists;
 
-    public PoiListAdapter(Context context, ArrayList<String> poiLists, ArrayList<String> defaultPoiLists) {
+    public PoiListAdapter(Context context, ArrayList<String> poiLists) {
         this.context = context;
         this.poiLists = poiLists;
-        this.defaultPoiLists = defaultPoiLists;
+        //this.poiLists.add(0, context.getString(R.string.autogenerate_poi_prompt));
     }
 
-    public void updateData(ArrayList<String> poiLists, ArrayList<String> defaultPoiLists) {
+    public void updateData(ArrayList<String> poiLists) {
         this.poiLists = poiLists;
-        this.defaultPoiLists = defaultPoiLists;
+        //this.poiLists.add(0, context.getString(R.string.autogenerate_poi_prompt));
     }
 
     @Override
-    public int getGroupCount() {
-        return 2;
+    public int getCount() {
+        return poiLists.size();
     }
 
     @Override
-    public int getChildrenCount(int i) {
-        return i == 0 ? poiLists.size() : defaultPoiLists.size();
+    public Object getItem(int i) {
+        return poiLists.get(i);
     }
 
     @Override
-    public Object getGroup(int i) {
-        return i == 0 ? poiLists : defaultPoiLists;
-    }
-
-    @Override
-    public Object getChild(int i, int i2) {
-        return i == 0 ? poiLists.get(i2) : defaultPoiLists.get(i2);
-    }
-
-    @Override
-    public long getGroupId(int i) {
+    public long getItemId(int i) {
         return i;
-    }
-
-    @Override
-    public long getChildId(int i, int i2) {
-        return i2;
     }
 
     @Override
@@ -71,31 +56,9 @@ public class PoiListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getGroupView(int groupPosition, boolean b, View view, ViewGroup viewGroup) {
-        GroupViewHolder viewHolder;
-        String groupName = groupPosition == 0 ? context.getString(R.string.custom_list) : context.getString(R.string.default_list);
-
-        if (view == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.view_poi_list_group_item, viewGroup, false);
-
-            viewHolder = new GroupViewHolder();
-            viewHolder.groupName = (TextView)view.findViewById(R.id.group_name);
-
-            view.setTag(viewHolder);
-        } else {
-            viewHolder = (GroupViewHolder)view.getTag();
-        }
-
-        viewHolder.groupName.setText(groupName);
-
-        return view;
-    }
-
-    @Override
-    public View getChildView(int groupPosition, int position, boolean isLastChild, View view, ViewGroup viewGroup) {
+    public View getView(int position, View view, ViewGroup viewGroup) {
         ViewHolder viewHolder;
-        String listName = groupPosition == 0 ? poiLists.get(position) : defaultPoiLists.get(position);
+        String listName = poiLists.get(position);
 
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -114,16 +77,8 @@ public class PoiListAdapter extends BaseExpandableListAdapter {
         return view;
     }
 
-    @Override
-    public boolean isChildSelectable(int i, int i2) {
-        return true;
-    }
-
     static class ViewHolder {
         TextView title;
     }
 
-    static class GroupViewHolder {
-        TextView groupName;
-    }
 }

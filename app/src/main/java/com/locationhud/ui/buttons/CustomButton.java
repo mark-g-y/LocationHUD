@@ -13,6 +13,8 @@ import com.locationhud.ui.UiUtility;
  */
 public class CustomButton extends TextView {
 
+    private Context context;
+
     public CustomButton(Context context) {
         super(context);
         init(context);
@@ -29,7 +31,14 @@ public class CustomButton extends TextView {
     }
 
     private void init(Context context) {
+        this.context = context;
         setBackgroundColor(context.getResources().getColor(android.R.color.transparent));
         UiUtility.setOnTouchColourChanges(this, android.R.color.transparent, R.color.item_pressed_translucent);
+    }
+
+    public void setOnTouchColourChanges(int colorUp, int colorDown) {
+        //setBackgroundColor(colorUp);
+        setBackgroundColor(context.getResources().getColor(colorUp));
+        UiUtility.setOnTouchColourChanges(this, colorUp, colorDown);
     }
 }

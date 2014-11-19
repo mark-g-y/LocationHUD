@@ -54,12 +54,16 @@
         android:id="@+id/automatic_generate_poi_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:paddingLeft="15dp"
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
         android:text="@string/autogenerate_poi_prompt"/>
 
-    <ExpandableListView
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/poi_expandable_list_view"
+        android:id="@+id/poi_list_view"
         />
 
 </LinearLayout>

@@ -1,8 +1,10 @@
 package com.locationhud;
 
 import android.content.Context;
+import android.content.res.Resources;
 
 import com.locationhud.compassdirection.MapPoint;
+import com.locationhud.selectpoilist.SelectPoiListActivity;
 import com.locationhud.storage.FileStorage;
 import com.locationhud.storage.JsonFactory;
 
@@ -21,7 +23,6 @@ public class PoiManager {
 
     private static ArrayList<ArrayList<MapPoint>> poiList = new ArrayList<ArrayList<MapPoint>>();
     private static HashMap<String, ArrayList<MapPoint>> poiMap = new HashMap<String, ArrayList<MapPoint>>();
-    private static HashMap<String, ArrayList<MapPoint>> defaultPoiMap = new HashMap<String, ArrayList<MapPoint>>();
     private static String currentList = "Default";
 
     static {
@@ -35,7 +36,6 @@ public class PoiManager {
         def.add(new MapPoint("San Francisco", 37.808305, -122.409104));
         def.add(new MapPoint("Home", 37.420980, -121.900235));
         poiMap.put("Default", def);
-        defaultPoiMap = (HashMap<String, ArrayList<MapPoint>>) poiMap.clone();
     }
 
     public static void addList() {
@@ -63,21 +63,7 @@ public class PoiManager {
         Iterator iterator = poiMap.keySet().iterator();
         while(iterator.hasNext()) {
             String listName = (String)iterator.next();
-            if (defaultPoiMap.get(listName) == null) {
-                list.add(listName);
-            }
-        }
-        return list;
-    }
-
-    public static ArrayList<String> getDefaultPoiLists() {
-        ArrayList<String> list = new ArrayList<String>();
-        Iterator iterator = poiMap.keySet().iterator();
-        while(iterator.hasNext()) {
-            String listName = (String)iterator.next();
-            if (defaultPoiMap.get(listName) != null) {
-                list.add(listName);
-            }
+            list.add(listName);
         }
         return list;
     }

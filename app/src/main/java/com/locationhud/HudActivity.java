@@ -60,6 +60,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
     private ProgressDialog loadingDialog;
     private boolean firstTime = true;
     private boolean isAutomatedPoiRetrieval = false;
+    private boolean isLocationPromptShowing = false;
 
     private double verticalViewAngle;
     private double horizontalViewAngle;
@@ -73,7 +74,6 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hud);
         isAutomatedPoiRetrieval = getIntent().getBooleanExtra(IntentTransferCodes.IS_AUTOMATED_POI_RETRIEVAL, false);
-        PoiManager.readLocationsFromFile(getApplicationContext());
 
         loadPoiLayouts();
 
@@ -96,6 +96,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         compassDirectionManager.onResume();
         camera = getCamera();
         firstTime = true;
+        isLocationPromptShowing = false;
         setCameraDisplayOrientation(this, Camera.CameraInfo.CAMERA_FACING_BACK, camera);
         initiateCameraViewport(camera);
 
@@ -105,7 +106,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         previewLayout.addView(preview);
 
         TextView poiListName = (TextView)findViewById(R.id.poi_list_name);
-        poiListName.setText(PoiManager.getCurrentList());
+        poiListName.setText(isAutomatedPoiRetrieval ? context.getString(R.string.autogenerate_poi_prompt) : PoiManager.getCurrentList());
 
         if (!MyLocationManager.isLocationServicesOn(this)) {
             MyLocationManager.promptUserTurnOnLocation(this);
@@ -234,6 +235,10 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
 
     @Override
     public void onCompassDirectionFound(final double azimuth) {
+        if (!MyLocationManager.isLocationServicesOn(this) && !isLocationPromptShowing) {
+            MyLocationManager.promptUserTurnOnLocation(this);
+            isLocationPromptShowing = true;
+        }
         Location location = compassDirectionManager.getLastLocation();
         if (firstTime) {
             getAltitudeFromServer(location);

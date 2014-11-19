@@ -117,12 +117,16 @@ public class MyLocationManager implements GooglePlayServicesClient.ConnectionCal
     }
 
     public double convertMagneticNorthToTrueNorth(double azimuth) {
-        final GeomagneticField geoField = new GeomagneticField(
-                (float) locationClient.getLastLocation().getLatitude(),
-                (float) locationClient.getLastLocation().getLongitude(),
-                (float) locationClient.getLastLocation().getAltitude(),
-                System.currentTimeMillis());
-        azimuth += geoField.getDeclination(); // converts magnetic north into true north
+        try {
+            final GeomagneticField geoField = new GeomagneticField(
+                    (float) locationClient.getLastLocation().getLatitude(),
+                    (float) locationClient.getLastLocation().getLongitude(),
+                    (float) locationClient.getLastLocation().getAltitude(),
+                    System.currentTimeMillis());
+            azimuth += geoField.getDeclination(); // converts magnetic north into true north
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
         return azimuth;
     }
 

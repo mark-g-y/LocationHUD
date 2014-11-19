@@ -1,6 +1,5 @@
 package com.locationhud.selectpoilist;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,13 +9,12 @@ import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.ViewManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +24,6 @@ import com.locationhud.PoiManager;
 import com.locationhud.R;
 import com.locationhud.storage.SharedPreferencesStorage;
 import com.locationhud.ui.buttons.CustomButton;
-import com.locationhud.utility.ActivityResultCodes;
 import com.locationhud.utility.IntentTransferCodes;
 
 import java.util.ArrayList;
@@ -35,23 +32,20 @@ import java.util.Collections;
 /**
  * Created by Mark on 05/11/2014.
  */
-public class SelectPoiListActivity extends FragmentActivity implements EditPoiListOptionsDialogCallback {
+public class SelectPoiListActivity extends FragmentActivity {
 
     private FragmentActivity myActivity;
-    private EditPoiListOptionsDialogCallback callback;
     private TrieNode customListHead;
-    private TrieNode defaultListHead;
-    private ArrayList<String> customListSearchResults = PoiManager.getCustomPoiLists();
-    private ArrayList<String> defaultListSearchResults = PoiManager.getDefaultPoiLists();
+    private ArrayList<String> listSearchResults = PoiManager.getCustomPoiLists();
     private EditText searchBar;
     private PoiListAdapter listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         myActivity = this;
-        callback = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_poi_list);
+        PoiManager.readLocationsFromFile(getApplicationContext());
 
         ImageButton newListButton = (ImageButton)findViewById(R.id.add_new_list);
         newListButton.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +79,7 @@ public class SelectPoiListActivity extends FragmentActivity implements EditPoiLi
                         Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
                         intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, value);
                         myActivity.startActivity(intent);
-                        customListSearchResults.add(value);
+                        listSearchResults.add(value);
                         updateListAdapter();
                         TrieNode.insertString(customListHead, value);
                         dialog.dismiss();
@@ -94,66 +88,46 @@ public class SelectPoiListActivity extends FragmentActivity implements EditPoiLi
             }
         });
 
-        listAdapter = new PoiListAdapter(getApplicationContext(), PoiManager.getCustomPoiLists(), PoiManager.getDefaultPoiLists());
+        listAdapter = new PoiListAdapter(getApplicationContext(), listSearchResults);
         updateListAdapter();
-        final ExpandableListView poiListView = (ExpandableListView)findViewById(R.id.poi_expandable_list_view);
+        final ListView poiListView = (ListView)findViewById(R.id.poi_list_view);
         poiListView.setAdapter(listAdapter);
-        poiListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+        poiListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int position, long l) {
-                if (groupPosition == 0) {
-                    PoiManager.setCurrentList(customListSearchResults.get(position));
-                } else {
-                    PoiManager.setCurrentList(defaultListSearchResults.get(position));
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        listAdapter.notifyDataSetChanged();
-                    }
-                });
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                PoiManager.setCurrentList(listSearchResults.get(position));
                 Intent intent = new Intent(myActivity, HudActivity.class);
                 startActivity(intent);
-                return false;
             }
         });
 
         poiListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long id) {
-                int itemType = ExpandableListView.getPackedPositionType(id);
-
-                if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-                    final int childPosition = ExpandableListView.getPackedPositionChild(id);
-                    final int groupPosition = ExpandableListView.getPackedPositionGroup(id);
-                    String[] allItems = {getApplicationContext().getString(R.string.edit), getApplicationContext().getString(R.string.delete)};
-                    String[] editOnlyItems = {getApplicationContext().getString(R.string.edit)};
-
-                    final String[] items = groupPosition == 0 ? allItems : editOnlyItems;
-                    EditPoiListOptionsDialog poiListOptionsDialog = new EditPoiListOptionsDialog();
-                    String listName = groupPosition == 0 ? customListSearchResults.get(childPosition) : defaultListSearchResults.get(childPosition);
-                    poiListOptionsDialog.initiate(callback, listName, childPosition, items);
-                    poiListOptionsDialog.show(myActivity.getSupportFragmentManager(), "EDIT");
-
-                    return true;
-
-                } else if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
-                    //do your per-group callback here
-                    return false;
-                }
-                return false;
+                CharSequence[] allItems = {getApplicationContext().getString(R.string.edit), getApplicationContext().getString(R.string.delete)};
+                final String listName = listSearchResults.get(position);
+                AlertDialog.Builder builder = new AlertDialog.Builder(myActivity);
+                builder.setTitle(getString(R.string.edit_poi_options)).setItems(allItems, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int clickPosition) {
+                        if (clickPosition == 0) {
+                            Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
+                            intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, listName);
+                            myActivity.startActivity(intent);
+                        } else if (clickPosition == 1) {
+                            listSearchResults.remove(position);
+                            PoiManager.removeList(listName);
+                            TrieNode.deleteString(customListHead, listName);
+                            updateListAdapter();
+                        }
+                    }
+                });
+                builder.create().show();
+                return true;
             }
         });
-        boolean[] expanded = SharedPreferencesStorage.getExpandedGroups(getApplicationContext());
-        for (int i = 0; i < expanded.length; i++) {
-            if (expanded[i]) {
-                poiListView.expandGroup(i);
-            }
-        }
 
         customListHead = TrieNode.createTrie(PoiManager.getCustomPoiLists());
-        defaultListHead = TrieNode.createTrie(PoiManager.getDefaultPoiLists());
 
         final TextView searchTitle = (TextView)findViewById(R.id.search_title);
 
@@ -178,19 +152,13 @@ public class SelectPoiListActivity extends FragmentActivity implements EditPoiLi
             @Override
             public void afterTextChanged(Editable editable) {
                 final TrieNode node = TrieNode.getCurrentPosition(customListHead, searchBar.getText().toString());
-                final TrieNode defaultListNode = TrieNode.getCurrentPosition(defaultListHead, searchBar.getText().toString());
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (node == null) {
-                            customListSearchResults.clear();
+                            listSearchResults.clear();
                         } else {
-                            customListSearchResults = TrieNode.getStringsWithCurrentPrefix(new ArrayList<String>(), node);
-                        }
-                        if (defaultListNode == null) {
-                            defaultListSearchResults.clear();
-                        } else {
-                            defaultListSearchResults = TrieNode.getStringsWithCurrentPrefix(new ArrayList<String>(), defaultListNode);
+                            listSearchResults = TrieNode.getStringsWithCurrentPrefix(new ArrayList<String>(), node);
                         }
                         updateListAdapter();
                     }
@@ -223,22 +191,14 @@ public class SelectPoiListActivity extends FragmentActivity implements EditPoiLi
                 startActivity(intent);
             }
         });
+        automatedPoiGenerateButton.setOnTouchColourChanges(R.color.item_pressed_translucent, android.R.color.transparent);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         PoiManager.saveLocationsToFile(getApplicationContext());
-        saveExpandedListViewState();
         finish();
-    }
-
-    private void saveExpandedListViewState() {
-        final ExpandableListView poiListView = (ExpandableListView)findViewById(R.id.poi_expandable_list_view);
-        boolean[] expanded = new boolean[2];
-        expanded[0] = poiListView.isGroupExpanded(0);
-        expanded[1] = poiListView.isGroupExpanded(1);
-        SharedPreferencesStorage.saveExpandedGroups(getApplicationContext(), expanded);
     }
 
     @Override
@@ -251,9 +211,8 @@ public class SelectPoiListActivity extends FragmentActivity implements EditPoiLi
     }
 
     private void updateListAdapter() {
-        Collections.sort(customListSearchResults);
-        Collections.sort(defaultListSearchResults);
-        listAdapter.updateData(customListSearchResults, defaultListSearchResults);
+        Collections.sort(listSearchResults);
+        listAdapter.updateData(listSearchResults);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -269,20 +228,5 @@ public class SelectPoiListActivity extends FragmentActivity implements EditPoiLi
         } else {
             mgr.hideSoftInputFromWindow(editText.getWindowToken(), 0);
         }
-    }
-
-    @Override
-    public void onEdit(String listName) {
-        Intent intent = new Intent(getApplication(), PoiEditMapActivity.class);
-        intent.putExtra(IntentTransferCodes.CURRENT_POI_LIST, listName);
-        myActivity.startActivity(intent);
-    }
-
-    @Override
-    public void onDelete(String listName, int childPosition) {
-        customListSearchResults.remove(childPosition);
-        PoiManager.removeList(listName);
-        TrieNode.deleteString(customListHead, listName);
-        updateListAdapter();
     }
 }
