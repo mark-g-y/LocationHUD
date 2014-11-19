@@ -25,6 +25,7 @@ public class RetrieveAltitudeTask extends AsyncTask<Void, Void, Void> {
     private double latitude;
     private double longitude;
     private double altitude = 0;
+    private boolean failed = false;
 
     public RetrieveAltitudeTask(AltitudeFoundCallback callback, double latitude, double longitude) {
         this.callback = callback;
@@ -40,6 +41,10 @@ public class RetrieveAltitudeTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void result) {
+        if (failed) {
+            callback.onAltitudeFound(-999);
+            return;
+        }
         callback.onAltitudeFound(altitude);
     }
 
@@ -74,9 +79,11 @@ public class RetrieveAltitudeTask extends AsyncTask<Void, Void, Void> {
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
+            failed = true;
         }
         catch (IOException e) {
             e.printStackTrace();
+            failed = true;
         }
 
         return result;
