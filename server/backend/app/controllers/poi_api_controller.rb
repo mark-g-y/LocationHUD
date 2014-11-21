@@ -1,18 +1,18 @@
 
 require 'json'
-require 'geography'
 
-class PoiApiController < ApplicationController 
+class PoiApiController < ApplicationController
+
+	include MyMath
 
 	@@MIN_DEGREE_DIFF = 3
+	@@MIN_DISTANCE = 300
 
 	def index 
 		lat = params[:latitude].to_f
 		long = params[:longitude].to_f
 		
-		# must use 'or' here. Distance per degree of lat/long is different throughout the world
-		# we must filter through most locations here, and then do additional manual filtering
-		nearby_locations = Poi.where('abs(latitude - ?) < ? or abs(longitude - ?) < ?', lat, @@MIN_DEGREE_DIFF, long, @@MIN_DEGREE_DIFF)
+		nearby_locations = Poi.where('get_distance(latitude, longitude, ?, ?) < ?', lat, long, @@MIN_DISTANCE)
 		location_list = []
 		nearby_locations.each do |row|
 			location_list.push(generate_location_json_from_db_row(row))

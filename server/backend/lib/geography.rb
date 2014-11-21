@@ -10,6 +10,6 @@ module Geography
 		
 		a = Math::sin(lat_diff/2) * Math::sin(lat_diff/2) + Math::cos(lat1) * Math::cos(lat2) * Math::sin(long_diff/2) * Math::sin(long_diff/2)
 		d = 2 * Math::atan2(Math::sqrt(a), Math::sqrt(1-a))
-		return d
+		return d * 6371
 	end
 end
