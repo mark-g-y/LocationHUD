@@ -1,9 +1,8 @@
 
 require 'json'
+require 'my_math'
 
 class PoiApiController < ApplicationController
-
-	include MyMath
 
 	@@MIN_DEGREE_DIFF = 3
 	@@MIN_DISTANCE = 300
@@ -11,6 +10,7 @@ class PoiApiController < ApplicationController
 	def index 
 		lat = params[:latitude].to_f
 		long = params[:longitude].to_f
+		f = MyMath.to_radians(123)
 		
 		nearby_locations = Poi.where('get_distance(latitude, longitude, ?, ?) < ?', lat, long, @@MIN_DISTANCE)
 		location_list = []
