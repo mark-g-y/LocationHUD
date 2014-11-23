@@ -1,6 +1,5 @@
 
 require 'json'
-require 'my_math'
 
 class PoiApiController < ApplicationController
 
@@ -11,12 +10,11 @@ class PoiApiController < ApplicationController
 	def index 
 		lat = params[:latitude].to_f
 		long = params[:longitude].to_f
-		f = MyMath.to_radians(123)
 		
 		nearby_locations = Poi.select('*, get_distance(latitude, longitude, %f, %f) as distance' % [Poi.sanitize(lat), Poi.sanitize(long)])
 			.where('get_distance(latitude, longitude, ?, ?) < ?', lat, long, @@MIN_DISTANCE)
 			.limit(@@POI_RESULT_LIMIT)
-			.order('distance')
+			.order('distance asc')
 		location_list = []
 		nearby_locations.each do |row|
 			location_list.push(generate_location_json_from_db_row(row))
