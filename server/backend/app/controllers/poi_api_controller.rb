@@ -5,14 +5,18 @@ require 'my_math'
 class PoiApiController < ApplicationController
 
 	@@MIN_DEGREE_DIFF = 3
-	@@MIN_DISTANCE = 300
+	@@MIN_DISTANCE = 200
+	@@POI_RESULT_LIMIT = 10
 
 	def index 
 		lat = params[:latitude].to_f
 		long = params[:longitude].to_f
 		f = MyMath.to_radians(123)
 		
-		nearby_locations = Poi.where('get_distance(latitude, longitude, ?, ?) < ?', lat, long, @@MIN_DISTANCE)
+		nearby_locations = Poi.select('*, get_distance(latitude, longitude, %f, %f) as distance' % [Poi.sanitize(lat), Poi.sanitize(long)])
+			.where('get_distance(latitude, longitude, ?, ?) < ?', lat, long, @@MIN_DISTANCE)
+			.limit(@@POI_RESULT_LIMIT)
+			.order('distance')
 		location_list = []
 		nearby_locations.each do |row|
 			location_list.push(generate_location_json_from_db_row(row))
@@ -26,6 +30,7 @@ class PoiApiController < ApplicationController
 		obj['latitude'] = row['latitude']
 		obj['longitude'] = row['longitude']
 		obj['altitude'] = row['altitude']
+		obj['distance'] = row['distance']
 		return obj
 	end
 
