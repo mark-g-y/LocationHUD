@@ -20,13 +20,9 @@ class PoiApiController < ApplicationController
 		nearby_locations = Poi.select('*, get_distance(latitude, longitude, %f, %f) as distance' % [Poi.sanitize(lat), Poi.sanitize(long)])
 			.where('get_distance(latitude, longitude, ?, ?) < ?', lat, long, @@MIN_DISTANCE)
 			.order('distance asc')
-			
-		for row in nearby_locations
-			puts(row['name'] + '|' + Clustering.get_name_difference('mission peak', row['name']).to_s)
-		end
-			
-		# group locations
-		nearby_locations = group_locations(nearby_locations)
+		
+		clustering = clustering::Clustering.new(nearby_locations)
+		nearby_locations = clustering.get_clusters_as_models()
 		
 		location_list = []
 		if not nearby_locations.nil?
@@ -35,11 +31,6 @@ class PoiApiController < ApplicationController
 			end
 		end
 		render :json => JSON.pretty_generate(location_list)
-	end
-	
-	def group_locations(locations)
-		# build graph
-		# 
 	end
 	
 	#POST request
