@@ -19,7 +19,8 @@ class PoiApiController < ApplicationController
 		nearby_locations = Poi.select('*, get_distance(latitude, longitude, %f, %f) as distance' % [Poi.sanitize(lat), Poi.sanitize(long)])
 			.where('get_distance(latitude, longitude, ?, ?) < ?', lat, long, @@MIN_DISTANCE)
 			.limit(@@POI_RESULT_LIMIT)
-			.order('distance asc')
+			.order('distance asc')	
+		
 		location_list = []
 		nearby_locations.each do |row|
 			location_list.push(generate_location_json_from_db_row(row))
@@ -38,28 +39,20 @@ class PoiApiController < ApplicationController
 			lat = poi['latitude']
 			long = poi['longitude']
 			altitude = poi['altitude']
-			similar_locations = Poi.select('*, get_distance(latitude, longitude, %f, %f) as distance' % [Poi.sanitize(lat), Poi.sanitize(long)])
-				.where('get_distance(latitude, longitude, ?, ?) < ?', lat, long, @@SAME_LOCATION_TOLERANCE_DISTANCE)
-				.order('distance asc')
-			best_match_name = get_best_name_match(name, similar_locations)
+			Poi.create(name: name, latitude: lat, longitude: long, altitude: altitude)
 		end
 		
-		#render :json => JSON.pretty_generate(poi_list
-		render :text => best_match_name
-		
-		# insert into raw poi table - these might be useful for later analysis.
-		# commented out for now to avoid spamming my database during testing
-		#PoiRaw.create(name: "name", latitude: 'lat', longitude: 'long', altitude: 'alt', time_uploaded: Time.now
-		
+		render :text => ''
+
 	end
 	
-	def get_best_name_match(name, potential_locations)
+	def get_best_match_by_name(name, potential_locations)
 		potential_locations.each do |row|
 			if do_names_match(name, row['name'])
-				return row['name']
+				return row
 			end
 		end
-		return name
+		return nil
 	end
 	
 	def do_names_match(name1, name2)
