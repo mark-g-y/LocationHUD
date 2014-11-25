@@ -50,10 +50,9 @@ class LinkedList
 	def pop_head()
 		@size -= 1
 		if @head.get_next() == nil
-			temp_head = @head
 			@head = nil
 			@tail = nil
-			return temp_head
+			return nil
 		end
 		temp_head = @head
 		@head.get_next().set_previous(nil)
@@ -68,10 +67,9 @@ class LinkedList
 	def pop_tail()
 		@size -= 1
 		if @tail.get_previous == nil
-			temp_tail = @tail
 			@head = nil
 			@tail = nil
-			return temp_tail
+			return nil
 		end
 		temp_tail = @tail
 		@tail.get_previous().set_next(nil)

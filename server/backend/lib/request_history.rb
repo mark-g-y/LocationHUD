@@ -6,7 +6,7 @@ class RequestHistory
 	@@counter = 0
 	@@ip_history = {}
 	@@user_history = {}
-	@@MAX_TIME_SPAM_SECONDS = 30
+	@@MAX_TIME_SPAM_SECONDS = 10
 	@@IP_SPAM_LIMIT_COUNT = 10
 	
 	def self.add()
@@ -32,7 +32,8 @@ class RequestHistory
 		iter = ip_list.get_tail()
 		while iter != nil
 			if (Time.now.to_i - iter.get_data()[1]) > @@MAX_TIME_SPAM_SECONDS
-				iter = ip_list.pop_tail()
+				ip_list.pop_tail()
+				iter = ip_list.get_tail()
 			else
 				break
 			end
