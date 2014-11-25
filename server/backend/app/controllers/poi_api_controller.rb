@@ -1,6 +1,7 @@
 
 require 'json'
 require 'clustering'
+require 'request_history'
 
 class PoiApiController < ApplicationController
 
@@ -11,6 +12,8 @@ class PoiApiController < ApplicationController
 	@@SAME_LOCATION_TOLERANCE_DISTANCE = 0.25
 	@@STRING_DIFFERENCE_THRESHOLD = 3
 	@@POI_RESULT_LIMIT = 10
+	
+	@@counter = 0
 
 	# GET request
 	def index 
@@ -21,7 +24,7 @@ class PoiApiController < ApplicationController
 			.where('get_distance(latitude, longitude, ?, ?) < ?', lat, long, @@MIN_DISTANCE)
 			.order('distance asc')
 		
-		clustering = clustering::Clustering.new(nearby_locations)
+		clustering = Clustering.new(nearby_locations)
 		nearby_locations = clustering.get_clusters_as_models()
 		
 		location_list = []
@@ -35,8 +38,16 @@ class PoiApiController < ApplicationController
 	
 	#POST request
 	def create
-		# <TODO> insert spam filter here
+	
+		user = params[:user]
 		
+		if is_spam(user, request.remote_ip)
+			message = {}
+			message['status'] = 'failure'
+			render :json => JSON.pretty_generate([message])
+			return
+		end
+				
 		poi_list = JSON.parse(request.body.read)
 		
 		for poi in poi_list
@@ -52,7 +63,7 @@ class PoiApiController < ApplicationController
 				Poi.create(name: name, latitude: lat, longitude: long, altitude: altitude)
 			end
 			
-			# for keeping track of stuff, if we ever need to acess the raw data instead of the condensed version
+			# for keeping track of stuff, if we ever need to access the raw data instead of the condensed version
 			# commented out for now to avoid spamming my server
 			#PoiRaw.create(name: name, latitude: lat, longitude: long, altitude: altitude, time_uploaded: Time.now)
 		end
@@ -61,6 +72,18 @@ class PoiApiController < ApplicationController
 		message['status'] = 'success'
 		render :json => JSON.pretty_generate([message])
 
+	end
+	
+	def is_spam(user, ip)
+	
+		# spam algorithm
+		# 1) check if IP has been uploading a lot of stuff lately
+		# 2) check if IP has been uploading a lot of similar stuff lately
+		# 2) check for keywords in content (i.e. name of POI in this case) - will add this feature in later, since the first two will stop any spam from making it to the top of the list
+		puts('Is spam ' + RequestHistory.is_ip_spam(ip).to_s)
+		RequestHistory.add()
+		puts('Current count is ' + RequestHistory.get().to_s)
+		return true
 	end
 	
 	def get_best_match_by_name(name, potential_locations)
