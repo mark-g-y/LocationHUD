@@ -1,8 +1,8 @@
 
 require 'my_math'
 
-module Geography
-	def get_distance(lat1, long1, lat2, long2)
+class Geography
+	def self.get_distance(lat1, long1, lat2, long2)
 		lat1 = MyMath.to_radians(lat1)
 		lat2 = MyMath.to_radians(lat2)
 		lat_diff = MyMath.to_radians(lat2 - lat1)

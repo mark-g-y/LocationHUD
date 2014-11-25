@@ -1,5 +1,6 @@
 
 require 'data_structures/linked_list'
+require 'geography'
 
 class RequestHistory
 
@@ -8,6 +9,10 @@ class RequestHistory
 	@@user_history = {}
 	@@MAX_TIME_SPAM_SECONDS = 10
 	@@IP_SPAM_LIMIT_COUNT = 10
+	
+	@@SAME_POI_DISTANCE_THRESHOLD = 1.5
+	@@MAX_NUMBER_SIMILAR_LOCATIONS = 3
+	@@MAX_TIME_SPAM_LOCATIONS = 3
 	
 	def self.add()
 		@@counter = @@counter + 1
@@ -19,6 +24,14 @@ class RequestHistory
 	
 	def self.request(user, ip)
 		
+	end
+	
+	def self.is_similar_location(ip, lat, long)
+		close_locations = PoiRaw.where('get_distance(latitude, longitude, ?, ?) < ? and ip = ? and datediff(?, time_uploaded) < ?', lat, long, @@SAME_POI_DISTANCE_THRESHOLD, ip, Time.now, @@MAX_TIME_SPAM_LOCATIONS)
+		if close_locations.count > @@MAX_NUMBER_SIMILAR_LOCATIONS
+			return true
+		end
+		return false
 	end
 	
 	def self.is_ip_spam(ip)

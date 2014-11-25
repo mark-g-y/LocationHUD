@@ -41,7 +41,7 @@ class PoiApiController < ApplicationController
 	
 		user = params[:user]
 		
-		if is_spam(user, request.remote_ip)
+		if is_spam(request.remote_ip)
 			message = {}
 			message['status'] = 'failure'
 			render :json => JSON.pretty_generate([message])
@@ -55,6 +55,14 @@ class PoiApiController < ApplicationController
 			lat = poi['latitude']
 			long = poi['longitude']
 			altitude = poi['altitude']
+			
+			if RequestHistory.is_similar_location(request.remote_ip, lat, long)
+				puts('Is similar ' + name)
+				next
+			else
+				puts('Is NOT similar ' + name)
+			end
+			
 			results = Poi.where(name: name, latitude: lat, longitude: long, altitude: altitude)
 			if results.count() > 0
 				result = results.first
@@ -65,7 +73,7 @@ class PoiApiController < ApplicationController
 			
 			# for keeping track of stuff, if we ever need to access the raw data instead of the condensed version
 			# commented out for now to avoid spamming my server
-			#PoiRaw.create(name: name, latitude: lat, longitude: long, altitude: altitude, time_uploaded: Time.now)
+			PoiRaw.create(name: name, latitude: lat, longitude: long, altitude: altitude, time_uploaded: Time.now, ip: request.remote_ip)
 		end
 		
 		message = {}
@@ -74,16 +82,16 @@ class PoiApiController < ApplicationController
 
 	end
 	
-	def is_spam(user, ip)
+	def is_spam(ip)
 	
 		# spam algorithm
 		# 1) check if IP has been uploading a lot of stuff lately
 		# 2) check if IP has been uploading a lot of similar stuff lately
 		# 2) check for keywords in content (i.e. name of POI in this case) - will add this feature in later, since the first two will stop any spam from making it to the top of the list
-		puts('Is spam ' + RequestHistory.is_ip_spam(ip).to_s)
-		RequestHistory.add()
-		puts('Current count is ' + RequestHistory.get().to_s)
-		return true
+		#puts('Is spam ' + RequestHistory.is_ip_spam(ip).to_s)
+		#RequestHistory.add()
+		#puts('Current count is ' + RequestHistory.get().to_s)
+		return RequestHistory.is_ip_spam(ip)
 	end
 	
 	def get_best_match_by_name(name, potential_locations)
