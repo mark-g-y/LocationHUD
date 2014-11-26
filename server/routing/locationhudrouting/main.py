@@ -16,14 +16,20 @@
 #
 
 from google.appengine.ext import webapp
+import urllib2
+
+url = "http://ec2-54-148-173-7.us-west-2.compute.amazonaws.com:3000/poi_api/"
 
 class Main(webapp.RequestHandler):
-    def get(self):
-        self.response.out.write('weee')
+	def get(self):
+		latitude = self.request.get("latitude")
+		longitude = self.request.get("longitude")
+		response =  urllib2.urlopen(url + "?latitude=" + latitude + "&longitude=" + longitude)
+		self.response.out.write(response.read())
 
-    def post(self):
-        name = self.request.get("name")
-        self.response.out.write('wooo')
+	def post(self):
+		name = self.request.get("name")
+		self.response.out.write('wooo')
 		
 application = webapp.WSGIApplication([
     ('/', Main),
