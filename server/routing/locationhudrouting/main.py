@@ -30,9 +30,10 @@ class Main(webapp.RequestHandler):
 
 	def post(self):
 		content = self.request.body
-		headers = self.request.headers
+		ip = self.request.remote_addr
 		request = httplib.HTTPConnection(url)
-		headers = headers.update({"Content-type": "application/json"})
+		headers = self.request.headers
+		headers.update({"Content-type": "application/json", "IP":ip})
 		request.request('POST', '', content, headers)
 		response = request.getresponse()
 		self.response.out.write(response.read())

@@ -39,9 +39,13 @@ class PoiApiController < ApplicationController
 	#POST request
 	def create
 	
+		for header in request.headers
+			puts(header)
+		end
+		ip = request.headers['IP']
 		user = params[:user]
 		
-		if is_spam(request.remote_ip)
+		if is_spam(ip)
 			message = {}
 			message['status'] = 'failure'
 			render :json => JSON.pretty_generate([message])
@@ -56,7 +60,7 @@ class PoiApiController < ApplicationController
 			long = poi['longitude']
 			altitude = poi['altitude']
 			
-			if RequestHistory.is_similar_location(request.remote_ip, lat, long)
+			if RequestHistory.is_similar_location(ip, lat, long)
 				puts('Is similar ' + name)
 				next
 			else
@@ -73,7 +77,7 @@ class PoiApiController < ApplicationController
 			
 			# for keeping track of stuff, if we ever need to access the raw data instead of the condensed version
 			# commented out for now to avoid spamming my server
-			PoiRaw.create(name: name, latitude: lat, longitude: long, altitude: altitude, time_uploaded: Time.now, ip: request.remote_ip)
+			PoiRaw.create(name: name, latitude: lat, longitude: long, altitude: altitude, time_uploaded: Time.now, ip: ip)
 		end
 		
 		message = {}
