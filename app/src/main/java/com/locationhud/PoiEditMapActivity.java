@@ -36,6 +36,8 @@ import com.locationhud.storage.SharedPreferencesStorage;
 import com.locationhud.ui.AnimationFactory;
 import com.locationhud.ui.UiUtility;
 import com.locationhud.utility.IntentTransferCodes;
+import com.locationhud.utility.ParseApiData;
+import com.parse.Parse;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,6 +67,8 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_poi_edit_map);
+        Parse.enableLocalDatastore(this);
+        Parse.initialize(this, ParseApiData.APPLICATION_ID, ParseApiData.CLIENT_KEY);
         myActivity = this;
         callback = this;
 
