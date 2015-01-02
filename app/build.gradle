@@ -19,10 +19,7 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file("file_location")
-            storePassword="insert_password_here"
-            keyAlias "insert_key_alias_here"
-            keyPassword="insert_password_here"
+
         }
     }
 }
@@ -31,4 +28,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:20.0.0'
     compile 'com.google.android.gms:play-services:3.2.+'
+    compile 'com.parse.bolts:bolts-android:1.+'
+    compile fileTree(dir: 'libs', include: 'Parse-*.jar')
 }
