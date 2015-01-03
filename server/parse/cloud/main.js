@@ -35,8 +35,21 @@ Parse.Cloud.define("nearby_locations", function(request, response) {
 			}
 			return d[name1.length][name2.length];
 		};
-		this.is_in_cluster = function(name) {
-			if (this.get_levenshtein_distance(name.toLowerCase(), this.name.toLowerCase()) < 3) {
+		this.get_distance = function (lat1,lon1,lat2,lon2) {
+			var R = 6371; // Radius of the earth in km
+			var dLat = this.deg2rad(lat2-lat1);  // deg2rad below
+			var dLon = this.deg2rad(lon2-lon1); 
+			var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+			var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+			var d = R * c; // Distance in km
+			return d;
+		};
+		this.deg2rad = function(deg) {
+			return deg * (Math.PI/180)
+		};
+		this.is_in_cluster = function(name, latitude, longitude) {
+			var latlong = this.names[this.name][0].get("latlong").toJSON();
+			if (this.get_levenshtein_distance(name.toLowerCase(), this.name.toLowerCase()) < 3 && Math.abs(this.get_distance(latitude, longitude, latlong["latitude"], latlong["longitude"])) < 0.1) {
 				return true;
 			}
 			return false;
@@ -57,7 +70,8 @@ Parse.Cloud.define("nearby_locations", function(request, response) {
 					groups.push(group);
 				} else {
 					for (var m = 0; m < groups.length; m++) {
-						if (groups[m].is_in_cluster(result.get("name"))) {
+						var latlong = result.get("latlong").toJSON();
+						if (groups[m].is_in_cluster(result.get("name"), latlong["latitude"], latlong["longitude"])) {
 							groups[m].add(result.get("name"), result);
 							break;
 						} else if (m == groups.length - 1) {
