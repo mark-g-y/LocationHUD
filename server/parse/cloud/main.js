@@ -86,7 +86,11 @@ Parse.Cloud.define("nearby_locations", function(request, response) {
 				}
 			}
 			results = [];
-			for (var i = 0; i < groups.length; i++) {
+			groups.sort(function(a, b) {
+				return -(a.number_of_points - b.number_of_points);
+			});
+			var MAX_GROUP_LENGTH = 8;
+			for (var i = 0; i < groups.length && i < MAX_GROUP_LENGTH; i++) {
 				result = {};
 				group = groups[i];
 				name = group["name"];
