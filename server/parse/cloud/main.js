@@ -4,6 +4,7 @@ Parse.Cloud.define("nearby_locations", function(request, response) {
 	function Cluster(){
 		this.name = "";
 		this.names = {};
+		this.number_of_points = 0;
 		this.most_popular_count = 0;
 		this.add = function(name, result) {
 			if (!(name in this.names)) {
@@ -14,6 +15,7 @@ Parse.Cloud.define("nearby_locations", function(request, response) {
 				this.name = name;
 				this.most_popular_count = this.names[name].length;
 			}
+			this.number_of_points++;
 		};
 		this.get_levenshtein_distance = function(name1, name2) {
 			var d = new Array(name1.length + 1);
@@ -83,7 +85,20 @@ Parse.Cloud.define("nearby_locations", function(request, response) {
 					}
 				}
 			}
-			response.success(groups);
+			results = [];
+			for (var i = 0; i < groups.length; i++) {
+				result = {};
+				group = groups[i];
+				name = group["name"];
+				result["name"] = name;
+				result["altitude"] = group["names"][name][0].get("altitude");
+				var latlong = group["names"][name][0].get("latlong").toJSON();
+				result["latitude"] = latlong["latitude"];
+				result["longitude"] = latlong["longitude"];
+				result["number_of_points"] = group["number_of_points"];
+				results.push(result);
+			}
+			response.success(results);
 		},
 		error : function() {
 			response.error("oh no!");
