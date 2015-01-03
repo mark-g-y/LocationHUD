@@ -94,7 +94,7 @@ Parse.Cloud.define("nearby_locations", function(request, response) {
 				result = {};
 				group = groups[i];
 				name = group["name"];
-				result["name"] = name;
+				result["title"] = name;
 				result["altitude"] = group["names"][name][0].get("altitude");
 				var latlong = group["names"][name][0].get("latlong").toJSON();
 				result["latitude"] = latlong["latitude"];
@@ -102,7 +102,7 @@ Parse.Cloud.define("nearby_locations", function(request, response) {
 				result["number_of_points"] = group["number_of_points"];
 				results.push(result);
 			}
-			response.success(results);
+			response.success(JSON.stringify(results));
 		},
 		error : function() {
 			response.error("oh no!");

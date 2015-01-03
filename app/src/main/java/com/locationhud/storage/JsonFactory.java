@@ -53,15 +53,33 @@ public class JsonFactory {
         for (int i = 0; i < poi.length(); i++) {
             JSONObject poiList = (JSONObject)poi.get(i);
             String key = poiList.getString(MapPoint.LIST_LABEL);
-            ArrayList<MapPoint> poiPoints = new ArrayList<MapPoint>();
             JSONArray poiListArray = poiList.getJSONArray(MapPoint.POI_LIST_LABEL);
-            for (int m = 0; m < poiListArray.length(); m++) {
-                JSONObject pointJson = (JSONObject)poiListArray.get(m);
-                MapPoint point = new MapPoint(pointJson.getString(MapPoint.TITLE_LABEL), pointJson.getDouble(MapPoint.LATITUDE_LABEL), pointJson.getDouble(MapPoint.LONGITUDE_LABEL), pointJson.getDouble(MapPoint.ALTITUDE_LABEL));
-                poiPoints.add(point);
-            }
+            ArrayList<MapPoint> poiPoints = decodeJsonForPoiList(poiListArray);
             poiMap.put(key, poiPoints);
         }
         return poiMap;
+    }
+
+    public static ArrayList<MapPoint> decodeJsonForPoiList(JSONArray poiListArray) {
+        ArrayList<MapPoint> poiPoints = new ArrayList<MapPoint>();
+        try {
+            for (int m = 0; m < poiListArray.length(); m++) {
+                JSONObject pointJson = (JSONObject) poiListArray.get(m);
+                MapPoint point = new MapPoint(pointJson.getString(MapPoint.TITLE_LABEL), pointJson.getDouble(MapPoint.LATITUDE_LABEL), pointJson.getDouble(MapPoint.LONGITUDE_LABEL), pointJson.getDouble(MapPoint.ALTITUDE_LABEL));
+                poiPoints.add(point);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return poiPoints;
+    }
+
+    public static ArrayList<MapPoint> decodeJsonForPoiList(String poiListArrayString) {
+        try {
+            return decodeJsonForPoiList(new JSONArray(poiListArrayString));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<MapPoint>();
     }
 }

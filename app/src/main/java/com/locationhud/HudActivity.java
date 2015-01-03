@@ -4,19 +4,14 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.res.Resources;
 import android.hardware.Camera;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
-import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,9 +24,8 @@ import com.locationhud.compassdirection.MapPoint;
 import com.locationhud.compassdirection.MyLocationManager;
 import com.locationhud.googleapi.retrievealtitude.AltitudeFoundCallback;
 import com.locationhud.googleapi.retrievealtitude.RetrieveAltitudeTask;
-import com.locationhud.selectpoilist.SelectPoiListActivity;
+import com.locationhud.storage.JsonFactory;
 import com.locationhud.ui.UiUtility;
-import com.locationhud.ui.buttons.CustomButton;
 import com.locationhud.ui.buttons.PressedColourChangeViewTouchListener;
 import com.locationhud.utility.IntentTransferCodes;
 import com.locationhud.utility.ParseApiData;
@@ -39,8 +33,6 @@ import com.parse.FunctionCallback;
 import com.parse.Parse;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,7 +78,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         Parse.initialize(this, ParseApiData.APPLICATION_ID, ParseApiData.CLIENT_KEY);
         isAutomatedPoiRetrieval = getIntent().getBooleanExtra(IntentTransferCodes.IS_AUTOMATED_POI_RETRIEVAL, false);
 
-        loadPoiLayouts();
+        loadPoiLayoutsFromStorage();
 
         compassDirectionManager = new CompassDirectionManager(this, this);
         compassDirectionManager.onCreate();
@@ -131,7 +123,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
             });
         }
 
-        loadPoiLayouts();
+        loadPoiLayoutsFromStorage();
     }
 
     @Override
@@ -159,12 +151,8 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         finish();
     }
 
-    private void loadPoiLayouts() {
-        RelativeLayout layoutHudActivity = (RelativeLayout) findViewById(R.id.activity_hud_layout);
-        for (int i = 0; i < poiLayouts.size(); i++) {
-            layoutHudActivity.removeView(poiLayouts.get(poi.get(i)));
-        }
-        poiLayouts.clear();
+    private void loadPoiLayoutsFromStorage() {
+        removePoiLayoutsInView();
         currentList = PoiManager.getCurrentList();
         poi = PoiManager.getList(currentList);
         if (poi == null) {
@@ -172,6 +160,14 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
             return;
         }
         loadPoiLayoutsIntoView();
+    }
+
+    private void removePoiLayoutsInView() {
+        RelativeLayout layoutHudActivity = (RelativeLayout) findViewById(R.id.activity_hud_layout);
+        for (int i = 0; i < poiLayouts.size(); i++) {
+            layoutHudActivity.removeView(poiLayouts.get(poi.get(i)));
+        }
+        poiLayouts.clear();
     }
 
     private void loadPoiLayoutsIntoView(){
@@ -279,14 +275,15 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("latitude", location.getLatitude());
         params.put("longitude", location.getLongitude());
-        ParseCloud.callFunctionInBackground("nearby_locations", params, new FunctionCallback<ArrayList<String>>() {
-            public void done(ArrayList<String> result, ParseException e) {
+        ParseCloud.callFunctionInBackground("nearby_locations", params, new FunctionCallback<String>() {
+            public void done(String result, ParseException e) {
                 if (e == null) {
                     receivedGetAutogenPoiCallback = true;
                     if (shouldDismissLoadingDialog() && loadingDialog != null) {
                         loadingDialog.dismiss();
                     }
-                    //poi = pois;
+                    removePoiLayoutsInView();
+                    poi = JsonFactory.decodeJsonForPoiList(result.toString());
                     Log.d("TEST", result.toString());
                     loadPoiLayoutsIntoView();
                 }
