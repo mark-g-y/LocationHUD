@@ -38,6 +38,7 @@ import com.locationhud.ui.UiUtility;
 import com.locationhud.utility.IntentTransferCodes;
 import com.locationhud.utility.ParseApiData;
 import com.parse.Parse;
+import com.parse.ParseObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,6 +58,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     private MyLocationManager locationManager;
     private GoogleMap map;
     private HashMap<Marker, MapPoint> markerToPoiMap = new HashMap<Marker, MapPoint>();
+    HashMap<Marker, MapPoint> oldMarkerToPoiMap = new HashMap<Marker, MapPoint>();
     private Marker lastAddedMarker;
     private LatLng lastLongClickLocation;
     private boolean isLocationServicesOn = false;
@@ -69,6 +71,9 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         setContentView(R.layout.activity_poi_edit_map);
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, ParseApiData.APPLICATION_ID, ParseApiData.CLIENT_KEY);
+        ParseObject testObject = new ParseObject("TestObject");
+        testObject.put("test", "rawr");
+        testObject.saveInBackground();
         myActivity = this;
         callback = this;
 
@@ -154,6 +159,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         saveMapZoomState = SharedPreferencesStorage.loadMapCamera(getApplicationContext(), map);
 
         addLocationsInCurrentListToMap();
+        storeLocationsInCurrentListForLaterComparison(markerToPoiMap);
 
         ImageButton navigationArrowForwardButton = (ImageButton)findViewById(R.id.navigation_arrow_back);
         navigationArrowForwardButton.setOnClickListener(new View.OnClickListener() {
@@ -162,6 +168,10 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                 onBackPressed();
             }
         });
+    }
+
+    private void storeLocationsInCurrentListForLaterComparison(HashMap<Marker, MapPoint> markerToPoiMap) {
+        oldMarkerToPoiMap = (HashMap<Marker, MapPoint>) markerToPoiMap.clone();
     }
 
     private void addMarker(LatLng latLong) {
@@ -198,6 +208,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         super.onPause();
         locationManager.onPause();
         updatePoiManager();
+        uploadListChangesToServer();
     }
 
     @Override
@@ -268,6 +279,15 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
             list.add((MapPoint)iterator.next());
         }
         PoiManager.setList(poiList, list);
+    }
+
+    private void uploadListChangesToServer() {
+        Collection values = markerToPoiMap.values();
+        Iterator iterator = values.iterator();
+        while (iterator.hasNext()) {
+            MapPoint mapPoint = (MapPoint) iterator.next();
+
+        }
     }
 
     private void selectAddressToAdd(PlacesAutoCompleteAdapter placesAutoCompleteAdapter, int position) {
