@@ -45,7 +45,12 @@ public class SelectPoiListActivity extends FragmentActivity {
         myActivity = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_poi_list);
-        PoiManager.readLocationsFromFile(getApplicationContext());
+        if (SharedPreferencesStorage.isFirstTimeOpenApp(this)) {
+            PoiManager.readDefaultLocationsFromFile();
+            SharedPreferencesStorage.setIsFirstTimeOpenApp(this, false);
+        } else {
+            PoiManager.readLocationsFromFile(getApplicationContext());
+        }
         listSearchResults = PoiManager.getCustomPoiLists();
 
         ImageButton newListButton = (ImageButton)findViewById(R.id.add_new_list);

@@ -25,19 +25,6 @@ public class PoiManager {
     private static HashMap<String, ArrayList<MapPoint>> poiMap = new HashMap<String, ArrayList<MapPoint>>();
     private static String currentList = "Default";
 
-    static {
-        try {
-            poiMap = JsonFactory.decodeJsonForPois(FileStorage.readFromRawResFile());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        ArrayList<MapPoint> def = new ArrayList<MapPoint>();
-        def.add(new MapPoint("Mission Peak", 37.512643, -121.880493, 767));
-        def.add(new MapPoint("San Francisco", 37.808305, -122.409104));
-        def.add(new MapPoint("Home", 37.420980, -121.900235));
-        poiMap.put("Default", def);
-    }
-
     public static void addList() {
         poiList.add(new ArrayList<MapPoint>());
     }
@@ -74,6 +61,19 @@ public class PoiManager {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void readDefaultLocationsFromFile() {
+        try {
+            poiMap = JsonFactory.decodeJsonForPois(FileStorage.readFromRawResFile());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ArrayList<MapPoint> def = new ArrayList<MapPoint>();
+        def.add(new MapPoint("Mission Peak", 37.512643, -121.880493, 767));
+        def.add(new MapPoint("San Francisco", 37.808305, -122.409104));
+        def.add(new MapPoint("Home", 37.420980, -121.900235));
+        poiMap.put("Default", def);
     }
 
     public static void readLocationsFromFile(Context context) {

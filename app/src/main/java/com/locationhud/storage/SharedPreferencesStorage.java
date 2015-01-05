@@ -31,6 +31,23 @@ public class SharedPreferencesStorage {
         private static final String KEY_DEFAULT_GROUP_EXPANDED = "default_group_expanded";
     }
 
+    public static class FirstTimeSettingsStorage {
+        private static final String KEY = "first_time_settings";
+        private static final String KEY_IS_FIRST_TIME = "is_first_time";
+    }
+
+    public static boolean isFirstTimeOpenApp(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(GeneralSettingsStorage.KEY, Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean(FirstTimeSettingsStorage.KEY_IS_FIRST_TIME, true);
+    }
+
+    public static void setIsFirstTimeOpenApp(Context context, boolean isFirstTime) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(GeneralSettingsStorage.KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putBoolean(FirstTimeSettingsStorage.KEY_IS_FIRST_TIME, isFirstTime);
+        sharedPreferencesEditor.commit();
+    }
+
     public static void saveExpandedGroups(Context context, boolean[] groups) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PoiListGroupStorage.KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
