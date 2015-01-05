@@ -201,9 +201,14 @@ public class SelectPoiListActivity extends FragmentActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        PoiManager.saveLocationsToFile(getApplicationContext());
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        PoiManager.saveLocationsToFile(getApplicationContext());
         finish();
     }
 
