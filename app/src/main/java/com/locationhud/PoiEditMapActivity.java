@@ -1,7 +1,6 @@
 package com.locationhud;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,12 +31,14 @@ import com.locationhud.googleapi.placesdetail.LatitudeLongitudeFoundCallback;
 import com.locationhud.googleapi.placesdetail.LatitudeLongitudeRetrievalTask;
 import com.locationhud.map.ConfirmSelectedLocationDialog;
 import com.locationhud.map.ConfirmSelectedLocationDialogCallback;
+import com.locationhud.parseapi.AuthenticationData;
+import com.locationhud.parseapi.ParseObjectConstants;
 import com.locationhud.storage.SharedPreferencesStorage;
 import com.locationhud.ui.AnimationFactory;
 import com.locationhud.ui.UiUtility;
 import com.locationhud.utility.IntentTransferCodes;
-import com.locationhud.utility.ParseApiData;
 import com.parse.Parse;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     private MyLocationManager locationManager;
     private GoogleMap map;
     private HashMap<Marker, MapPoint> markerToPoiMap = new HashMap<Marker, MapPoint>();
-    HashMap<Marker, MapPoint> oldMarkerToPoiMap = new HashMap<Marker, MapPoint>();
+    HashMap<String, MapPoint> oldMarkers = new HashMap<String, MapPoint>();
     private Marker lastAddedMarker;
     private LatLng lastLongClickLocation;
     private boolean isLocationServicesOn = false;
@@ -69,11 +70,6 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_poi_edit_map);
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this, ParseApiData.APPLICATION_ID, ParseApiData.CLIENT_KEY);
-        ParseObject testObject = new ParseObject("TestObject");
-        testObject.put("test", "rawr");
-        testObject.saveInBackground();
         myActivity = this;
         callback = this;
 
@@ -171,7 +167,12 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     }
 
     private void storeLocationsInCurrentListForLaterComparison(HashMap<Marker, MapPoint> markerToPoiMap) {
-        oldMarkerToPoiMap = (HashMap<Marker, MapPoint>) markerToPoiMap.clone();
+        Collection values = markerToPoiMap.values();
+        Iterator iterator = values.iterator();
+        while (iterator.hasNext()) {
+            MapPoint mapPoint = (MapPoint) iterator.next();
+            oldMarkers.put(mapPoint.toString(), mapPoint);
+        }
     }
 
     private void addMarker(LatLng latLong) {
@@ -282,12 +283,20 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     }
 
     private void uploadListChangesToServer() {
+        ArrayList<ParseObject> changedLocations = new ArrayList<ParseObject>();
         Collection values = markerToPoiMap.values();
         Iterator iterator = values.iterator();
         while (iterator.hasNext()) {
             MapPoint mapPoint = (MapPoint) iterator.next();
-
+            if (oldMarkers.get(mapPoint.toString()) == null) {
+                ParseObject locationParseObject = new ParseObject(ParseObjectConstants.LocationObject.NAME);
+                locationParseObject.put(ParseObjectConstants.LocationObject.NAME_FIELD_TITLE, mapPoint.getTitle());
+                locationParseObject.put(ParseObjectConstants.LocationObject.LATITUDE_LONGITUDE_FIELD_TITLE, new ParseGeoPoint(mapPoint.getLatitude(), mapPoint.getLongitude()));
+                locationParseObject.put(ParseObjectConstants.LocationObject.ALTITUDE_FIELD_TITLE, mapPoint.getAltitude());
+                changedLocations.add(locationParseObject);
+            }
         }
+        ParseObject.saveAllInBackground(changedLocations);
     }
 
     private void selectAddressToAdd(PlacesAutoCompleteAdapter placesAutoCompleteAdapter, int position) {

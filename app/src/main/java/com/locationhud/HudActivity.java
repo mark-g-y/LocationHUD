@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.hardware.Camera;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.View;
@@ -24,11 +23,11 @@ import com.locationhud.compassdirection.MapPoint;
 import com.locationhud.compassdirection.MyLocationManager;
 import com.locationhud.googleapi.retrievealtitude.AltitudeFoundCallback;
 import com.locationhud.googleapi.retrievealtitude.RetrieveAltitudeTask;
+import com.locationhud.parseapi.AuthenticationData;
 import com.locationhud.storage.JsonFactory;
 import com.locationhud.ui.UiUtility;
 import com.locationhud.ui.buttons.PressedColourChangeViewTouchListener;
 import com.locationhud.utility.IntentTransferCodes;
-import com.locationhud.utility.ParseApiData;
 import com.parse.FunctionCallback;
 import com.parse.Parse;
 import com.parse.ParseCloud;
@@ -74,8 +73,6 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         context = getApplicationContext();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hud);
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this, ParseApiData.APPLICATION_ID, ParseApiData.CLIENT_KEY);
         isAutomatedPoiRetrieval = getIntent().getBooleanExtra(IntentTransferCodes.IS_AUTOMATED_POI_RETRIEVAL, false);
 
         loadPoiLayoutsFromStorage();
@@ -284,7 +281,6 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
                     }
                     removePoiLayoutsInView();
                     poi = JsonFactory.decodeJsonForPoiList(result.toString());
-                    Log.d("TEST", result.toString());
                     loadPoiLayoutsIntoView();
                 }
             }
