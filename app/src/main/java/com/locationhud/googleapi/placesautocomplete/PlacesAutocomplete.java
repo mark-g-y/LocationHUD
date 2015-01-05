@@ -31,7 +31,6 @@ public class PlacesAutocomplete {
         try {
             StringBuilder sb = new StringBuilder(GoogleApiManager.PLACES_API_BASE + GoogleApiManager.TYPE_AUTOCOMPLETE + GoogleApiManager.OUT_JSON);
             sb.append("?key=" + GoogleApiManager.GOOGLE_API_KEY);
-            sb.append("&components=country:us");
             sb.append("&input=" + URLEncoder.encode(input, "utf8"));
 
             URL url = new URL(sb.toString());
