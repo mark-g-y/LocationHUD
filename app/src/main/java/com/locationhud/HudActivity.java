@@ -314,7 +314,8 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
                         RelativeLayout.LayoutParams.WRAP_CONTENT,
                         RelativeLayout.LayoutParams.WRAP_CONTENT
                 );
-                params.setMargins((int)(horizontalWidth + width / 2 - poiLayout.getWidth() / 2), (int)(-verticalWidth + height / 2 - poiLayout.getHeight() / 2), 0, 0);
+                //params.setMargins((int)(horizontalWidth + width / 2 - poiLayout.getWidth() / 2), (int)(-verticalWidth + height / 2 - poiLayout.getHeight() / 2), 0, 0);
+                params.setMargins((int)(horizontalWidth + width / 2 - poiLayout.getWidth() / 2), (int)(-verticalWidth + height / 2 - poiLayout.getHeight()), 0, 0);
                 poiLayout.setLayoutParams(params);
                 poiLayout.updateDistanceToPoi(CompassDirectionManager.getDistance(getLastLocation(), poi));
                 poiLayout.setVisibility(View.VISIBLE);

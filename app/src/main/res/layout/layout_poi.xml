@@ -23,4 +23,11 @@
         android:text="Location"
         android:textSize="16dp"
         android:id="@+id/location_view"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_maps_place"
+        android:layout_gravity="center"
+        />
 </LinearLayout>
