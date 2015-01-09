@@ -17,10 +17,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.locationhud.compassdirection.MapPoint;
@@ -45,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by Mark on 23/10/2014.
@@ -164,6 +167,19 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                 onBackPressed();
             }
         });
+
+        zoomMapCameraToCentreOfAllMarkers(map, markerToPoiMap);
+    }
+
+    private void zoomMapCameraToCentreOfAllMarkers(GoogleMap map, HashMap<Marker, MapPoint> markers) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (Marker marker : markers.keySet()) {
+            builder.include(marker.getPosition());
+        }
+        LatLngBounds bounds = builder.build();
+        int padding = 10; // offset from edges of the map in pixels
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 500, 500, padding);
+        map.animateCamera(cu);
     }
 
     private void storeLocationsInCurrentListForLaterComparison(HashMap<Marker, MapPoint> markerToPoiMap) {
@@ -226,15 +242,16 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
 
     @Override
     public void onMyLocationFound(Location location) {
+        //zoomMapCameraToCentreOfAllMarkers(map, markerToPoiMap);
         if (!saveMapZoomState) {
             saveMapZoomState = true;
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locationManager.getLastLocation().getLatitude(), locationManager.getLastLocation().getLongitude()), 12));
+            //map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locationManager.getLastLocation().getLatitude(), locationManager.getLastLocation().getLongitude()), 12));
         }
      }
 
     @Override
     public void onMyLocationUnavailable() {
-
+        //zoomMapCameraToCentreOfAllMarkers(map, markerToPoiMap);
     }
 
     @Override
