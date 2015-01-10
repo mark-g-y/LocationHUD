@@ -1,0 +1,7 @@
+
+class ParseApiConfig
+  APPLICATION_ID_HEADER = "X-Parse-Application-Id"
+  APPLICATION_ID_VALUE = ""
+  APPLICATION_REST_API_KEY_HEADER = "X-Parse-REST-API-Key"
+  APPLICATION_REST_API_KEY_KEY = ""
+end
