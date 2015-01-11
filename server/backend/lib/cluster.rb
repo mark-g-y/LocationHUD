@@ -13,7 +13,7 @@ class Cluster
 		@pois.push(poi)
 		if @most_common.nil?
 			@most_common = poi
-		elsif poi['number'] > @most_common['number']
+		elsif poi['count'] > @most_common['count']
 			@most_common = poi
 		end
 	end

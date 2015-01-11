@@ -2,8 +2,7 @@
 require 'json'
 require 'clustering'
 require 'request_history'
-require 'parse_api_config'
-require 'net/http'
+require 'parse_api_library'
 require 'uri'
 
 class PoiApiController < ApplicationController
@@ -24,19 +23,10 @@ class PoiApiController < ApplicationController
 		long = params[:longitude].to_s.to_f
 		
 		url = URI.parse("https://api.parse.com/1/functions/nearby_locations_within_range")
-		request = Net::HTTP::Post.new(url.to_s, initheader = {'Content-Type' =>'application/json'})
-		request.add_field(ParseApiConfig::APPLICATION_ID_HEADER, ParseApiConfig::APPLICATION_ID_VALUE)
-		request.add_field(ParseApiConfig::APPLICATION_REST_API_KEY_HEADER, ParseApiConfig::APPLICATION_REST_API_KEY_KEY)
+		request = ParseApiLibrary.init_post_request(url)
 		request.body = JSON.dump({"latitude" => lat, "longitude" => long})
-		
-		http = Net::HTTP.new(url.host, url.port)
-		http.use_ssl = true
-		response = http.request(request)
-		
-		# parse the response object - by default, Parse returns the response as a value under the "result" key
-		response_obj = JSON.parse(response.body)
-    response_obj = response_obj["result"]
-		nearby_locations = JSON.load(response_obj)
+		response = ParseApiLibrary.send_http_request(url, request, true)
+		nearby_locations = ParseApiLibrary.parse_response(response, "result")
 		
 		clustering = Clustering.new(nearby_locations)
 		nearby_locations = clustering.get_clusters_as_models()
@@ -83,50 +73,29 @@ class PoiApiController < ApplicationController
 			
 			url = URI.parse("https://api.parse.com/1/classes/Location")
 			url.query = URI.encode_www_form("where" => JSON.dump({"name" => name, "latlong" => {
-         "$nearSphere" => {
-           "__type" => "GeoPoint",
-           "latitude" => lat,
-           "longitude" => long
-         },
-         "$maxDistanceInKilometers" => 1
-       }, "altitude" => altitude}))
-
-      request = Net::HTTP::Get.new(url.to_s)
-      request.add_field(ParseApiConfig::APPLICATION_ID_HEADER, ParseApiConfig::APPLICATION_ID_VALUE)
-      request.add_field(ParseApiConfig::APPLICATION_REST_API_KEY_HEADER, ParseApiConfig::APPLICATION_REST_API_KEY_KEY)
-
-      http = Net::HTTP.new(url.host, url.port)
-      http.use_ssl = true
-      response = http.request(request)
-      
-      # parse the response object - by default, Parse returns the response as a value under the "result" key
-      response_obj = JSON.parse(response.body)
-      response_obj = response_obj["results"]
-      locations = response_obj
+       "$nearSphere" => {
+         "__type" => "GeoPoint",
+         "latitude" => lat,
+         "longitude" => long
+       },
+       "$maxDistanceInKilometers" => 1
+      }, "altitude" => altitude}))
+      request = ParseApiLibrary.init_get_request(url)
+      response = ParseApiLibrary.send_http_request(url, request, true)
+      locations = ParseApiLibrary.parse_response(response, "results")
+      puts locations
   	  
 			if locations.count() > 0
 				location = locations.first
 				url = URI.parse("https://api.parse.com/1/classes/Location/%s/" % [location["objectId"]])
-        request = Net::HTTP::Put.new(url.to_s,  initheader = {"Content-Type" => "application/json"})
-        request.add_field(ParseApiConfig::APPLICATION_ID_HEADER, ParseApiConfig::APPLICATION_ID_VALUE)
-        request.add_field(ParseApiConfig::APPLICATION_REST_API_KEY_HEADER, ParseApiConfig::APPLICATION_REST_API_KEY_KEY)
+        request = ParseApiLibrary.init_put_request(url)
         request.body = JSON.dump({"count" => location["count"] + 1})
-  
-        http = Net::HTTP.new(url.host, url.port)
-        http.use_ssl = true
-        response = http.request(request)
+        response = ParseApiLibrary.send_http_request(url, request, true)
 			else
-			  puts "Should create"
-				# Poi.create(name: name, latitude: lat, longitude: long, altitude: altitude)
 				url = URI.parse("https://api.parse.com/1/classes/Location/")
-				request = Net::HTTP::Post.new(url.to_s, initheader = {"Content-Type" => "application/json"})
-				request.add_field(ParseApiConfig::APPLICATION_ID_HEADER, ParseApiConfig::APPLICATION_ID_VALUE)
-        request.add_field(ParseApiConfig::APPLICATION_REST_API_KEY_HEADER, ParseApiConfig::APPLICATION_REST_API_KEY_KEY)
+				request = ParseApiLibrary.init_post_request(url)
         request.body = JSON.dump({"name" => name, "latlong" => {"__type" => "GeoPoint", "latitude" => lat, "longitude" => long}, "altitude" => altitude, "count" => 1})
-        
-        http = Net::HTTP.new(url.host, url.port)
-        http.use_ssl = true
-        response = http.request(request)
+        response = ParseApiLibrary.send_http_request(url, request, true)
 			end
 			
 		end
