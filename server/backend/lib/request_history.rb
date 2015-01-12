@@ -8,6 +8,7 @@ class RequestHistory
   @@ip_history = {}
   @@ip_history_mutex = nil
   @@submission_history = {}
+  @@submission_history_mutex = nil
   @@user_history = {}
   @@MAX_TIME_SHORT_SPAM_SECONDS = 3
   #@@MAX_TIME_LONG_SPAM_SECONDS = 360000
@@ -27,12 +28,12 @@ class RequestHistory
     if not @@is_initialized
       @@is_initialized = true
       @@ip_history_mutex = Mutex.new
+      @@submission_history_mutex = Mutex.new
       Thread.new do
         while true do
           sleep(@@TIME_BEFORE_CLEAR_SECONDS)
           @@ip_history.each do |key, ip_list|
             # remove outdated stuff out of the back
-            puts key.to_s + ip_list.to_s
             iter = ip_list.get_tail()
             @@ip_history_mutex.synchronize do
               while iter != nil
@@ -50,31 +51,56 @@ class RequestHistory
           end
         end
       end
+      Thread.new do
+        while true do
+          sleep(@@TIME_BEFORE_CLEAR_SECONDS)
+          @@submission_history.each do |key, submission_list|
+            # remove outdated stuff out of the back
+            iter = submission_list.get_tail()
+            @@ip_history_mutex.synchronize do
+              while iter != nil
+                if (Time.now.to_i - iter.get_data()[0]) > @@MAX_TIME_SPAM_LOCATIONS
+                  submission_list.pop_tail()
+                  iter = submission_list.get_tail
+                else
+                  break
+                end
+              end
+              if @@submission_history[key].size() == 0
+                @@submission_history.delete(key)
+              end
+            end
+          end
+        end
+      end
     end
-  end
-  
-  def self.add()
-    @@counter = @@counter + 1
-  end
-  
-  def self.get
-    return @@counter
-  end
-  
-  def self.request(user, ip)
-    
   end
   
   def self.is_similar_location(ip, name, lat, long)
-    if not @@submission_history.key?(ip)
-      @@submission_history[ip] = LinkedList.new()
+    @@submission_history_mutex.synchronize do
+      if not @@submission_history.key?(ip) then
+        @@submission_history[ip] = LinkedList.new()
+      end
+      submission_list = @@submission_history[ip]
+      submission_list.add_front([Time.now.to_i, ip, name, lat, long])
     end
     submission_list = @@submission_history[ip]
-    submission_list.add_front([ip, name, lat, long])
-    # close_locations = PoiRaw.where('get_distance(latitude, longitude, ?, ?) < ? and ip = ? and datediff(?, time_uploaded) < ?', lat, long, @@SAME_POI_DISTANCE_THRESHOLD, ip, Time.now, @@MAX_TIME_SPAM_LOCATIONS)
-    if close_locations.count > @@MAX_NUMBER_SIMILAR_LOCATIONS
+    iter = submission_list.get_head()
+    spam_counter = 0
+    while iter != nil
+      if (Time.now.to_i - iter.get_data()[0]) < @@MAX_TIME_SPAM_LOCATIONS
+        submission = iter.get_data()
+        if submission[2] == name or (submission[3] == lat and submission[4])
+          spam_counter += 1
+        end
+      end
+      iter = iter.get_next()
+    end
+    
+    if spam_counter > @@MAX_NUMBER_SIMILAR_LOCATIONS
       return true
     end
+    
     return false
   end
   
@@ -104,9 +130,6 @@ class RequestHistory
     puts("IP list size" + ip_list.size.to_s)
     puts('short_spam:' + short_spam_counter.to_s + '|' + 'long_spam:' + long_spam_counter.to_s)
     
-    #if ip_list.size > @@IP_SPAM_LIMIT_COUNT
-    # return true
-    #end
     if short_spam_counter > @@IP_SHORT_SPAM_LIMIT_COUNT or long_spam_counter > @@IP_LONG_SPAM_LIMIT_COUNT
       return true
     end

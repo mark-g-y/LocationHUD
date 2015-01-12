@@ -69,7 +69,7 @@ class PoiApiController < ApplicationController
   			long = poi['longitude']
   			altitude = poi['altitude']
   			
-  			if RequestHistory.is_similar_location(ip, lat, long)
+  			if RequestHistory.is_similar_location(ip, name, lat, long)
   				puts('Is similar ' + name)
   				next
   			else
