@@ -42,11 +42,14 @@ class PoiApiController < ApplicationController
 	
 	#POST request
 	def create
+	  
+	  RequestHistory.init_history()
 	
 		for header in request.headers
 			puts(header)
 		end
-		ip = request.headers['IP']
+		# ip = request.headers['IP']
+		ip = request.remote_ip
 		user = params[:user]
 		
 		if is_spam(ip)
@@ -55,54 +58,57 @@ class PoiApiController < ApplicationController
 			render :json => JSON.pretty_generate([message])
 			return
 		end
-				
-		poi_list = JSON.parse(request.body.read)
 		
-		for poi in poi_list
-			name = poi['title']
-			lat = poi['latitude']
-			long = poi['longitude']
-			altitude = poi['altitude']
-			
-			if RequestHistory.is_similar_location(ip, lat, long)
-				puts('Is similar ' + name)
-				next
-			else
-				puts('Is NOT similar ' + name)
-			end
-			
-			url = URI.parse("https://api.parse.com/1/classes/Location")
-			url.query = URI.encode_www_form("where" => JSON.dump({"name" => name, "latlong" => {
-       "$nearSphere" => {
-         "__type" => "GeoPoint",
-         "latitude" => lat,
-         "longitude" => long
-       },
-       "$maxDistanceInKilometers" => 1
-      }, "altitude" => altitude}))
-      request = ParseApiLibrary.init_get_request(url)
-      response = ParseApiLibrary.send_http_request(url, request, true)
-      locations = ParseApiLibrary.parse_response(response, "results")
-      puts locations
-  	  
-			if locations.count() > 0
-				location = locations.first
-				url = URI.parse("https://api.parse.com/1/classes/Location/%s/" % [location["objectId"]])
-        request = ParseApiLibrary.init_put_request(url)
-        request.body = JSON.dump({"count" => location["count"] + 1})
+    Thread.new do
+  				
+  		poi_list = JSON.parse(request.body.read)
+  		
+  		for poi in poi_list
+  			name = poi['title']
+  			lat = poi['latitude']
+  			long = poi['longitude']
+  			altitude = poi['altitude']
+  			
+  			if RequestHistory.is_similar_location(ip, lat, long)
+  				puts('Is similar ' + name)
+  				next
+  			else
+  				puts('Is NOT similar ' + name)
+  			end
+  			
+  			url = URI.parse("https://api.parse.com/1/classes/Location")
+  			url.query = URI.encode_www_form("where" => JSON.dump({"name" => name, "latlong" => {
+         "$nearSphere" => {
+           "__type" => "GeoPoint",
+           "latitude" => lat,
+           "longitude" => long
+         },
+         "$maxDistanceInKilometers" => 1
+        }, "altitude" => altitude}))
+        request = ParseApiLibrary.init_get_request(url)
         response = ParseApiLibrary.send_http_request(url, request, true)
-			else
-				url = URI.parse("https://api.parse.com/1/classes/Location/")
-				request = ParseApiLibrary.init_post_request(url)
-        request.body = JSON.dump({"name" => name, "latlong" => {"__type" => "GeoPoint", "latitude" => lat, "longitude" => long}, "altitude" => altitude, "count" => 1})
-        response = ParseApiLibrary.send_http_request(url, request, true)
-			end
-			
+        locations = ParseApiLibrary.parse_response(response, "results")
+    	  
+  			if locations.count() > 0
+  				location = locations.first
+  				url = URI.parse("https://api.parse.com/1/classes/Location/%s/" % [location["objectId"]])
+          request = ParseApiLibrary.init_put_request(url)
+          request.body = JSON.dump({"count" => location["count"] + 1})
+          response = ParseApiLibrary.send_http_request(url, request, true)
+  			else
+  				url = URI.parse("https://api.parse.com/1/classes/Location/")
+  				request = ParseApiLibrary.init_post_request(url)
+          request.body = JSON.dump({"name" => name, "latlong" => {"__type" => "GeoPoint", "latitude" => lat, "longitude" => long}, "altitude" => altitude, "count" => 1})
+          response = ParseApiLibrary.send_http_request(url, request, true)
+  			end
+  			
+  		end
+		
 		end
 		
 		message = {}
-		message['status'] = 'success'
-		render :json => JSON.pretty_generate([message])
+    message['status'] = 'success'
+    render :json => JSON.pretty_generate([message])
 
 	end
 	
