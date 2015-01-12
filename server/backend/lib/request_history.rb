@@ -30,11 +30,11 @@ class RequestHistory
       Thread.new do
         while true do
           sleep(@@TIME_BEFORE_CLEAR_SECONDS)
-          @@ip_history_mutex.synchronize do
-            @@ip_history.each do |key, ip_list|
-              # remove outdated stuff out of the back
-              puts key.to_s + ip_list.to_s
-              iter = ip_list.get_tail()
+          @@ip_history.each do |key, ip_list|
+            # remove outdated stuff out of the back
+            puts key.to_s + ip_list.to_s
+            iter = ip_list.get_tail()
+            @@ip_history_mutex.synchronize do
               while iter != nil
                 if (Time.now.to_i - iter.get_data()[1]) > @@MAX_TIME_LONG_SPAM_SECONDS
                   ip_list.pop_tail()
