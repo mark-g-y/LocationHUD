@@ -74,10 +74,7 @@ class PoiApiController < ApplicationController
   				puts('Is NOT similar ' + name)
   			end
   			
-  			puts "foo"
   			results = Poi.where(title: name, latitude: lat, longitude: long, altitude: altitude)
-
-  			puts results.count()
   			begin
   			  if results.count() > 0
             result = results.first
@@ -109,22 +106,6 @@ class PoiApiController < ApplicationController
 		#RequestHistory.add()
 		#puts('Current count is ' + RequestHistory.get().to_s)
 		return RequestHistory.is_ip_spam(ip)
-	end
-	
-	def get_best_match_by_name(name, potential_locations)
-		potential_locations.each do |row|
-			if do_names_match(name, row['name'])
-				return row
-			end
-		end
-		return nil
-	end
-	
-	def do_names_match(name1, name2)
-		name1.downcase!
-		name2.downcase
-		# <TODO> add string similarity check to see how different they are
-		return true # DEBUG for now
 	end
 	
 	def generate_location_json_from_db_row(row)
