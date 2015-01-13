@@ -22,11 +22,9 @@ class PoiApiController < ApplicationController
 		lat = params[:latitude].to_s.to_f
 		long = params[:longitude].to_s.to_f
 		
-		url = URI.parse("https://api.parse.com/1/functions/nearby_locations_within_range")
-		request = ParseApiLibrary.init_post_request(url)
-		request.body = JSON.dump({"latitude" => lat, "longitude" => long})
-		response = ParseApiLibrary.send_http_request(url, request, true)
-		nearby_locations = ParseApiLibrary.parse_response(response, "result")
+		nearby_locations = Poi.select('*, get_distance(latitude, longitude, %f, %f) as distance' % [Poi.sanitize(lat), Poi.sanitize(long)])
+		  .where('get_distance(latitude, longitude, ?, ?) < ?', lat, long, @@MIN_DISTANCE)
+      .order('distance asc')
 		
 		clustering = Clustering.new(nearby_locations)
 		nearby_locations = clustering.get_clusters_as_models()
