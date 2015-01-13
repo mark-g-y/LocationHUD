@@ -74,32 +74,21 @@ class PoiApiController < ApplicationController
   				puts('Is NOT similar ' + name)
   			end
   			
-  			url = URI.parse("https://api.parse.com/1/classes/Location")
-  			url.query = URI.encode_www_form("where" => JSON.dump({"name" => name, "latlong" => {
-         "$nearSphere" => {
-           "__type" => "GeoPoint",
-           "latitude" => lat,
-           "longitude" => long
-         },
-         "$maxDistanceInKilometers" => 1
-        }, "altitude" => altitude}))
-        request = ParseApiLibrary.init_get_request(url)
-        response = ParseApiLibrary.send_http_request(url, request, true)
-        locations = ParseApiLibrary.parse_response(response, "results")
-    	  
-  			if locations.count() > 0
-  				location = locations.first
-  				url = URI.parse("https://api.parse.com/1/classes/Location/%s/" % [location["objectId"]])
-          request = ParseApiLibrary.init_put_request(url)
-          request.body = JSON.dump({"count" => location["count"] + 1})
-          response = ParseApiLibrary.send_http_request(url, request, true)
-  			else
-  				url = URI.parse("https://api.parse.com/1/classes/Location/")
-  				request = ParseApiLibrary.init_post_request(url)
-          request.body = JSON.dump({"name" => name, "latlong" => {"__type" => "GeoPoint", "latitude" => lat, "longitude" => long}, "altitude" => altitude, "count" => 1})
-          response = ParseApiLibrary.send_http_request(url, request, true)
-  			end
-  			
+  			puts "foo"
+  			results = Poi.where(title: name, latitude: lat, longitude: long, altitude: altitude)
+
+  			puts results.count()
+  			begin
+  			  if results.count() > 0
+            result = results.first
+            Poi.update(result['id'], count: result['count'] + 1)
+          else
+            Poi.create(title: name, latitude: lat, longitude: long, altitude: altitude)
+          end
+  			ensure
+          ActiveRecord::Base.connection_pool.release_connection
+        end
+
   		end
 		
 		end
