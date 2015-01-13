@@ -1,4 +1,4 @@
-package com.locationhud.retrieveautogenpoi;
+package com.locationhud.autogenpoiapi;
 
 import com.locationhud.compassdirection.MapPoint;
 

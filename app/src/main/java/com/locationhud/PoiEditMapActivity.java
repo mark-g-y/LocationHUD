@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.locationhud.autogenpoiapi.SubmitPoiListTask;
 import com.locationhud.compassdirection.MapPoint;
 import com.locationhud.compassdirection.MyLocationFoundCallback;
 import com.locationhud.compassdirection.MyLocationManager;
@@ -300,20 +301,17 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     }
 
     private void uploadListChangesToServer() {
-        ArrayList<ParseObject> changedLocations = new ArrayList<ParseObject>();
+        ArrayList<MapPoint> mapPoints = new ArrayList<MapPoint>();
         Collection values = markerToPoiMap.values();
         Iterator iterator = values.iterator();
         while (iterator.hasNext()) {
             MapPoint mapPoint = (MapPoint) iterator.next();
             if (oldMarkers.get(mapPoint.toString()) == null) {
-                ParseObject locationParseObject = new ParseObject(ParseObjectConstants.LocationObject.NAME);
-                locationParseObject.put(ParseObjectConstants.LocationObject.NAME_FIELD_TITLE, mapPoint.getTitle());
-                locationParseObject.put(ParseObjectConstants.LocationObject.LATITUDE_LONGITUDE_FIELD_TITLE, new ParseGeoPoint(mapPoint.getLatitude(), mapPoint.getLongitude()));
-                locationParseObject.put(ParseObjectConstants.LocationObject.ALTITUDE_FIELD_TITLE, mapPoint.getAltitude());
-                changedLocations.add(locationParseObject);
+                mapPoints.add(mapPoint);
             }
         }
-        ParseObject.saveAllInBackground(changedLocations);
+        SubmitPoiListTask task = new SubmitPoiListTask(mapPoints);
+        task.execute();
     }
 
     private void selectAddressToAdd(PlacesAutoCompleteAdapter placesAutoCompleteAdapter, int position) {

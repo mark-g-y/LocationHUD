@@ -29,21 +29,26 @@ public class JsonFactory {
             ArrayList<MapPoint> poiListValues = (ArrayList<MapPoint>) pairs.getValue();
             JSONObject poiList = new JSONObject();
             poiList.put(MapPoint.LIST_LABEL, (String)pairs.getKey());
-            JSONArray poiListArray = new JSONArray();
-            for (MapPoint point : poiListValues) {
-                JSONObject pointJson = new JSONObject();
-                pointJson.put(MapPoint.TITLE_LABEL, point.getTitle());
-                pointJson.put(MapPoint.LATITUDE_LABEL, point.getLatitude());
-                pointJson.put(MapPoint.LONGITUDE_LABEL, point.getLongitude());
-                pointJson.put(MapPoint.ALTITUDE_LABEL, point.getAltitude());
-                poiListArray.put(pointJson);
-            }
+            JSONArray poiListArray = generateJsonForPoiList(poiListValues);
             poiList.put(MapPoint.POI_LIST_LABEL, poiListArray);
             poi.put(poiList);
             //iterator.remove(); // avoids a ConcurrentModificationException
         }
         //Log.d("GENERATEJSON", poi.toString());
         return poi;
+    }
+
+    public static JSONArray generateJsonForPoiList(ArrayList<MapPoint> poiList) throws JSONException{
+        JSONArray poiListArray = new JSONArray();
+        for (MapPoint point : poiList) {
+            JSONObject pointJson = new JSONObject();
+            pointJson.put(MapPoint.TITLE_LABEL, point.getTitle());
+            pointJson.put(MapPoint.LATITUDE_LABEL, point.getLatitude());
+            pointJson.put(MapPoint.LONGITUDE_LABEL, point.getLongitude());
+            pointJson.put(MapPoint.ALTITUDE_LABEL, point.getAltitude());
+            poiListArray.put(pointJson);
+        }
+        return poiListArray;
     }
 
     public static HashMap<String, ArrayList<MapPoint>> decodeJsonForPois(String jsonPoi) throws JSONException{
