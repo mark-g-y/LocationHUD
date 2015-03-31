@@ -68,7 +68,6 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     private LatLng lastLongClickLocation;
     private boolean isLocationServicesOn = false;
     private boolean saveMapZoomState = false;
-    private String poiList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,11 +75,6 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         setContentView(R.layout.activity_poi_edit_map);
         myActivity = this;
         callback = this;
-
-        poiList = getIntent().getStringExtra(IntentTransferCodes.CURRENT_POI_LIST);
-        if (poiList == null) {
-            poiList = "Default";
-        }
 
         AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.prompt_to_select_poi);
         final PlacesAutoCompleteAdapter placesAutoCompleteAdapter = new PlacesAutoCompleteAdapter(this, R.layout.places_autocomplete_list_item);
@@ -173,6 +167,9 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     }
 
     private void zoomMapCameraToCentreOfAllMarkers(GoogleMap map, HashMap<Marker, MapPoint> markers) {
+        if (markers.keySet().size() <= 0) {
+            return;
+        }
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (Marker marker : markers.keySet()) {
             builder.include(marker.getPosition());
@@ -282,7 +279,7 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
     }
 
     private void addLocationsInCurrentListToMap() {
-        ArrayList<MapPoint> list = PoiManager.getList(poiList);
+        ArrayList<MapPoint> list = PoiManager.readLocationsFromFile(getApplicationContext());
         for (int i = 0; i < list.size(); i++) {
             MapPoint mp = list.get(i);
             Marker marker = map.addMarker(new MarkerOptions().position(new LatLng(mp.getLatitude(), mp.getLongitude())).draggable(true));
@@ -297,7 +294,8 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         while (iterator.hasNext()) {
             list.add((MapPoint)iterator.next());
         }
-        PoiManager.setList(poiList, list);
+        PoiManager.setList(list);
+        PoiManager.saveLocationsToFile(getApplicationContext(), list);
     }
 
     private void uploadListChangesToServer() {
