@@ -1,78 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <fragment
-        android:id="@+id/map"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        />
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:orientation="horizontal"
-        android:background="@android:color/white"
-        >
-
-        <com.locationhud.ui.buttons.CustomImageButton
-            android:id="@+id/navigation_arrow_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:gravity="center_vertical|right"
-            android:padding="15dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_navigation_arrow_back"/>
-
-        <AutoCompleteTextView
-            android:id="@+id/prompt_to_select_poi"
-            android:hint="@string/prompt_to_select_poi"
-            android:textColor="@android:color/black"
-            android:gravity="center_vertical|left"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/edit_poi_map_instructions"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        android:background="@android:color/white"
-        >
-        <TextView
-            android:text="@string/edit_poi_map_instructions"
-            android:textColor="@android:color/black"
-            android:gravity="center"
+        android:minHeight="@dimen/abc_action_bar_default_height_material"
+        android:background="@color/background_material_light" />
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+        <fragment
+            android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             />
-        <Button
-            android:id="@+id/button_instructions_read"
-            android:text="@string/confirm_instructions_read"
-            android:textColor="@color/holo_blue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:background="@android:color/transparent"
-            />
-    </LinearLayout>
 
-</RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal"
+            android:background="@android:color/white"
+            >
+
+            <AutoCompleteTextView
+                android:id="@+id/prompt_to_select_poi"
+                android:hint="@string/prompt_to_select_poi"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical|left"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/edit_poi_map_instructions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:background="@android:color/white"
+            >
+            <TextView
+                android:text="@string/edit_poi_map_instructions"
+                android:textColor="@android:color/black"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                />
+            <Button
+                android:id="@+id/button_instructions_read"
+                android:text="@string/confirm_instructions_read"
+                android:textColor="@color/holo_blue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:background="@android:color/transparent"
+                />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

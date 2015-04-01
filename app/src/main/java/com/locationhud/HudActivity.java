@@ -72,6 +72,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         setContentView(R.layout.activity_hud);
 
         //loadPoiLayoutsFromStorage();
+        PoiManager.setList(PoiManager.readLocationsFromFile(getApplicationContext()));
 
         compassDirectionManager = new CompassDirectionManager(this, this);
         compassDirectionManager.onCreate();
@@ -163,12 +164,6 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
 
     private void showLoadingDialog() {
         loadingDialog = ProgressDialog.show(this, "", getResources().getString(R.string.loading), true, true);
-        loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface) {
-                onBackPressed();
-            }
-        });
     }
 
     private void loadPoiLayoutsFromStorage() {

@@ -5,6 +5,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
@@ -53,7 +55,7 @@ import java.util.List;
 /**
  * Created by Mark on 23/10/2014.
  */
-public class PoiEditMapActivity extends FragmentActivity implements MyLocationFoundCallback,
+public class PoiEditMapActivity extends ActionBarActivity implements MyLocationFoundCallback,
         ConfirmSelectedLocationDialogCallback, LatitudeLongitudeFoundCallback {
 
     private static final int DEFAULT_MAP_ZOOM_LEVEL = 10;
@@ -76,6 +78,48 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
         myActivity = this;
         callback = this;
 
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(null);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+        initPlacesSearchAutocomplete();
+
+        boolean instructionsViewed = SharedPreferencesStorage.isInstructionsRead(getApplicationContext());
+        if (!instructionsViewed) {
+            LinearLayout instructionsView = (LinearLayout)findViewById(R.id.edit_poi_map_instructions);
+            instructionsView.setVisibility(View.VISIBLE);
+            final Button confirmInstructionsReadButton = (Button)findViewById(R.id.button_instructions_read);
+            confirmInstructionsReadButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    SharedPreferencesStorage.setInstructionsRead(getApplicationContext(), true);
+                    hideInstructions();
+                }
+            });
+            UiUtility.setOnTouchColourChanges(confirmInstructionsReadButton, android.R.color.transparent, R.color.item_pressed);
+        }
+
+        isLocationServicesOn = MyLocationManager.isLocationServicesOn(this);
+        locationManager = new MyLocationManager(this, this, -1);
+        locationManager.onCreate();
+
+        initMap();
+
+        addLocationsInCurrentListToMap();
+        storeLocationsInCurrentListForLaterComparison(markerToPoiMap);
+
+        zoomMapCameraToCentreOfAllMarkers(map, markerToPoiMap);
+    }
+
+    private void initPlacesSearchAutocomplete() {
         AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.prompt_to_select_poi);
         final PlacesAutoCompleteAdapter placesAutoCompleteAdapter = new PlacesAutoCompleteAdapter(this, R.layout.places_autocomplete_list_item);
         autoCompView.setAdapter(placesAutoCompleteAdapter);
@@ -97,26 +141,9 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
                 return false;
             }
         });
+    }
 
-        boolean instructionsViewed = SharedPreferencesStorage.isInstructionsRead(getApplicationContext());
-        if (!instructionsViewed) {
-            LinearLayout instructionsView = (LinearLayout)findViewById(R.id.edit_poi_map_instructions);
-            instructionsView.setVisibility(View.VISIBLE);
-            final Button confirmInstructionsReadButton = (Button)findViewById(R.id.button_instructions_read);
-            confirmInstructionsReadButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    SharedPreferencesStorage.setInstructionsRead(getApplicationContext(), true);
-                    hideInstructions();
-                }
-            });
-            UiUtility.setOnTouchColourChanges(confirmInstructionsReadButton, android.R.color.transparent, R.color.item_pressed);
-        }
-
-        isLocationServicesOn = MyLocationManager.isLocationServicesOn(this);
-        locationManager = new MyLocationManager(this, this, -1);
-        locationManager.onCreate();
-
+    private void initMap() {
         SupportMapFragment mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
         map = mapFragment.getMap();
 
@@ -151,19 +178,6 @@ public class PoiEditMapActivity extends FragmentActivity implements MyLocationFo
             }
         });
         saveMapZoomState = SharedPreferencesStorage.loadMapCamera(getApplicationContext(), map);
-
-        addLocationsInCurrentListToMap();
-        storeLocationsInCurrentListForLaterComparison(markerToPoiMap);
-
-        ImageButton navigationArrowForwardButton = (ImageButton)findViewById(R.id.navigation_arrow_back);
-        navigationArrowForwardButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
-
-        zoomMapCameraToCentreOfAllMarkers(map, markerToPoiMap);
     }
 
     private void zoomMapCameraToCentreOfAllMarkers(GoogleMap map, HashMap<Marker, MapPoint> markers) {
