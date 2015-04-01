@@ -24,29 +24,6 @@
             />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:orientation="horizontal"
-            android:background="@android:color/white"
-            >
-
-            <AutoCompleteTextView
-                android:id="@+id/prompt_to_select_poi"
-                android:hint="@string/prompt_to_select_poi"
-                android:textColor="@android:color/black"
-                android:gravity="center_vertical|left"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/edit_poi_map_instructions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
