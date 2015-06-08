@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.hardware.Camera;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.View;
@@ -236,16 +237,17 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
     private void initiateCameraViewport(Camera camera) {
         Camera.Parameters p = camera.getParameters();
         int zoom = p.getZoomRatios().get(p.getZoom()).intValue();
-        Camera.Size sz = p.getPreviewSize();
-        double aspect = (double) sz.width / (double) sz.height;
         double thetaV = Math.toRadians(p.getVerticalViewAngle());
-        double thetaH = 2d * Math.atan(aspect * Math.tan(thetaV / 2));
+        double thetaH = Math.toRadians(p.getHorizontalViewAngle());
         verticalViewAngle = Math.toDegrees(2d * Math.atan(100d * Math.tan(thetaV / 2d) / zoom));
         horizontalViewAngle = 0.8 * Math.toDegrees(2d * Math.atan(100d * Math.tan(thetaH / 2d) / zoom));
+        verticalViewAngle = verticalViewAngle >= 90 ? 90 : verticalViewAngle;
+        horizontalViewAngle = horizontalViewAngle >= 90 ? 90 : horizontalViewAngle;
         // must swap the variables because Android thinks they're reversed
         horizontalViewAngle = verticalViewAngle + horizontalViewAngle;
         verticalViewAngle = horizontalViewAngle - verticalViewAngle;
         horizontalViewAngle = horizontalViewAngle - verticalViewAngle;
+        Log.d("DETECTED", verticalViewAngle + ", " + horizontalViewAngle);
     }
 
     private int getOrientation (int rotation) {
@@ -310,7 +312,7 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
         }
     }
 
-    private void positionPoi(final MapPoint poi, double azimuth, double bearing, double tiltAngle, double altitudeAngle) {
+    private void positionPoi(final MapPoint poi, final double azimuth, final double bearing, double tiltAngle, double altitudeAngle) {
         Display display = getWindowManager().getDefaultDisplay();
         final int width = display.getWidth();
         final int height = display.getHeight();
@@ -333,7 +335,8 @@ public class HudActivity extends Activity implements CompassDirectionFoundCallba
                         RelativeLayout.LayoutParams.WRAP_CONTENT
                 );
                 //params.setMargins((int)(horizontalWidth + width / 2 - poiLayout.getWidth() / 2), (int)(-verticalWidth + height / 2 - poiLayout.getHeight() / 2), 0, 0);
-                params.setMargins((int)(horizontalWidth + width / 2 - poiLayout.getWidth() / 2), (int)(-verticalWidth + height / 2 - poiLayout.getHeight()), 0, 0);
+                params.setMargins((int) (horizontalWidth + width / 2 - poiLayout.getWidth() / 2), (int)(-verticalWidth + height / 2 - poiLayout.getHeight()), 0, 0);
+                //Log.d("YAY!", bearing + ", " + azimuth + ", " +horizontalWidth + ", " +  verticalWidth);
                 poiLayout.setLayoutParams(params);
                 poiLayout.updateDistanceToPoi(CompassDirectionManager.getDistance(getLastLocation(), poi));
                 poiLayout.setVisibility(View.VISIBLE);
