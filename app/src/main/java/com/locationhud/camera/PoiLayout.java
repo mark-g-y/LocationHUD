@@ -72,4 +72,8 @@ public class PoiLayout extends LinearLayout {
         TextView locationTextView = (TextView)findViewById(R.id.location_view);
         locationTextView.setTextColor(color);
     }
+
+    public MapPoint getPoi() {
+        return poi;
+    }
 }
