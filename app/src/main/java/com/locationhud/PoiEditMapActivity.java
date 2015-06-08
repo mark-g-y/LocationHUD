@@ -42,6 +42,7 @@ import com.locationhud.map.ConfirmSelectedLocationDialogCallback;
 import com.locationhud.storage.SharedPreferencesStorage;
 import com.locationhud.ui.AnimationFactory;
 import com.locationhud.ui.UiUtility;
+import com.locationhud.utility.ToolbarUtility;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,6 +67,7 @@ public class PoiEditMapActivity extends ActionBarActivity implements MyLocationF
     private LatLng lastLongClickLocation;
     private boolean isLocationServicesOn = false;
     private boolean saveMapZoomState = false;
+    private AutoCompleteTextView locationSearchAutoCompView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,17 +76,7 @@ public class PoiEditMapActivity extends ActionBarActivity implements MyLocationF
         myActivity = this;
         callback = this;
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(null);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        ToolbarUtility.initWithBackButton(this, "", R.id.toolbar);
 
         boolean instructionsViewed = SharedPreferencesStorage.isInstructionsRead(getApplicationContext());
         if (!instructionsViewed) {
@@ -108,7 +100,7 @@ public class PoiEditMapActivity extends ActionBarActivity implements MyLocationF
         initMap();
 
         addLocationsInCurrentListToMap();
-        storeLocationsInCurrentListForLaterComparison(markerToPoiMap);
+        saveCurrentListLocations(markerToPoiMap);
 
         zoomMapCameraToCentreOfAllMarkers(map, markerToPoiMap);
     }
@@ -164,7 +156,7 @@ public class PoiEditMapActivity extends ActionBarActivity implements MyLocationF
         map.animateCamera(cu);
     }
 
-    private void storeLocationsInCurrentListForLaterComparison(HashMap<Marker, MapPoint> markerToPoiMap) {
+    private void saveCurrentListLocations(HashMap<Marker, MapPoint> markerToPoiMap) {
         Collection values = markerToPoiMap.values();
         Iterator iterator = values.iterator();
         while (iterator.hasNext()) {
@@ -324,8 +316,7 @@ public class PoiEditMapActivity extends ActionBarActivity implements MyLocationF
     @Override
     public void onLatitudeLongitudeFound(String name, LatLng latLng) {
         if (latLng != null) {
-            AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.prompt_to_select_poi);
-            autoCompView.setText("");
+            locationSearchAutoCompView.setText("");
             name = name.indexOf(',') >= 0 ? name.substring(0, name.indexOf(',')) : name;
             addMarker(name, latLng);
         } else {
@@ -337,8 +328,8 @@ public class PoiEditMapActivity extends ActionBarActivity implements MyLocationF
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.poi_edit_map, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        AutoCompleteTextView autoCompView = (AutoCompleteTextView) MenuItemCompat.getActionView(searchItem);
-        setupPoiAutoCompleteTextView(autoCompView);
+        locationSearchAutoCompView = (AutoCompleteTextView) MenuItemCompat.getActionView(searchItem);
+        setupPoiAutoCompleteTextView(locationSearchAutoCompView);
         MenuItemCompat.expandActionView(searchItem);
         return super.onCreateOptionsMenu(menu);
     }

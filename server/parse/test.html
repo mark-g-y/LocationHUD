@@ -1,0 +1,157 @@
+
+<script>
+function Cluster(){
+	this.name = "";
+	this.names = {};
+	this.most_popular_count = 0;
+	this.number_of_points = 0;
+	this.add = function(name, result) {
+		if (!(name in this.names)) {
+			this.names[name] = [];
+		}
+		this.names[name].push(result);
+		if (this.names[name].length > this.most_popular_count) {
+			this.name = name;
+			this.most_popular_count = this.names[name].length;
+		}
+		this.number_of_points++;
+	};
+	this.get_levenshtein_distance = function(name1, name2) {
+		var d = new Array(name1.length + 1);
+		for (var i = 0; i < name1.length + 1; i++) {
+			d[i] = new Array(name2.length + 1);
+			d[i][0] = i;
+		}
+		for (var i = 0; i < name2.length + 1; i++) {
+			d[0][i] = i;
+		}
+		for (var x = 1; x < name2.length + 1; x++) {
+			for (var y = 1; y < name1.length + 1; y++) {
+				if (name1[y] == name2[x]) {
+					d[y][x] = d[y - 1][x - 1];
+				} else {
+					d[y][x] = Math.min(d[y - 1][x], d[y][x - 1], d[y - 1][x - 1]) + 1;
+				}
+			}
+		}
+		return d[name1.length][name2.length];
+	};
+	this.get_distance = function (lat1,lon1,lat2,lon2) {
+		var R = 6371; // Radius of the earth in km
+		var dLat = this.deg2rad(lat2-lat1);  // deg2rad below
+		var dLon = this.deg2rad(lon2-lon1); 
+		var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+		var d = R * c; // Distance in km
+		return d;
+	};
+	this.deg2rad = function(deg) {
+		return deg * (Math.PI/180)
+	};
+	this.is_in_cluster = function(name, latitude, longitude) {
+		var latlong = this.names[this.name][0]["latlong"];
+		if (this.get_levenshtein_distance(name.toLowerCase(), this.name.toLowerCase()) < 3 && Math.abs(this.get_distance(latitude, longitude, latlong["latitude"], latlong["longitude"])) < 0.1) {
+			return true;
+		}
+		return false;
+	};
+}
+
+results = [{
+                        "__type": "Object",
+                        "altitude": 123,
+                        "className": "Location",
+                        "createdAt": "2015-01-02T08:15:22.129Z",
+                        "latlong": {
+                            "__type": "GeoPoint",
+                            "latitude": 0,
+                            "longitude": 0
+                        },
+                        "name": "test",
+                        "objectId": "JANNJMlC2B",
+                        "updatedAt": "2015-01-02T08:15:30.126Z"
+                    },
+					{
+                        "__type": "Object",
+                        "altitude": 123,
+                        "className": "Location",
+                        "createdAt": "2015-01-02T08:15:22.129Z",
+                        "latlong": {
+                            "__type": "GeoPoint",
+                            "latitude": 0,
+                            "longitude": 0
+                        },
+                        "name": "sdfsdf",
+                        "objectId": "JANNgggB",
+                        "updatedAt": "2015-01-02T08:15:30.126Z"
+                    },
+					{
+                        "__type": "Object",
+                        "altitude": 123,
+                        "className": "Location",
+                        "createdAt": "2015-01-02T09:38:42.758Z",
+                        "latlong": {
+                            "__type": "GeoPoint",
+                            "latitude": 1,
+                            "longitude": 0
+                        },
+                        "name": "Test23",
+                        "objectId": "3ZU4P1wqut",
+                        "updatedAt": "2015-01-02T09:41:35.222Z"
+                    },
+                    {
+                        "__type": "Object",
+                        "altitude": 123,
+                        "className": "Location",
+                        "createdAt": "2015-01-02T09:38:42.758Z",
+                        "latlong": {
+                            "__type": "GeoPoint",
+                            "latitude": 0,
+                            "longitude": 0
+                        },
+                        "name": "Test23",
+                        "objectId": "3ZU4P1wqut",
+                        "updatedAt": "2015-01-02T09:41:35.222Z"
+                    }];
+
+var groups = [];
+for (var i = 0; i < results.length; i++) {
+	var result = results[i];
+	if (groups.length == 0) {
+		var group = new Cluster();
+		group.add(result["name"], result);
+		groups.push(group);
+	} else {
+		for (var m = 0; m < groups.length; m++) {
+			var foo = result["latlong"]["latitude"];
+			if (groups[m].is_in_cluster(result["name"], result["latlong"]["latitude"], result["latlong"]["longitude"])) {
+				groups[m].add(result["name"], result);
+				break;
+			} else if (m == groups.length - 1) {
+				var group = new Cluster();
+				group.add(result["name"], result);
+				groups.push(group);
+				break;
+			}
+		}
+	}
+}
+results = [];
+groups.sort(function(a, b) {
+	return -(a.number_of_points - b.number_of_points);
+});
+var MAX_GROUP_LENGTH = 2;
+for (var i = 0; i < groups.length && i < MAX_GROUP_LENGTH; i++) {
+	result = {};
+	group = groups[i];
+	name = group["name"];
+	result["title"] = name;
+	result["altitude"] = group["names"][name][0]["altitude"]; // need to edit
+	var latlong = group["names"][name][0]["latlong"]; // need to edit
+	result["latitude"] = latlong["latitude"]; //need to edit
+	result["longitude"] = latlong["longitude"]; // need to edit
+	result["number_of_points"] = group["number_of_points"];
+	results.push(result);
+}
+document.write(JSON.stringify(results));
+</script>

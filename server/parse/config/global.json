@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "LocationHUD": {
+            "applicationId": "pb4VAwYShHI5pUbE3ewFojxj5EpU4Nr2o1YZnRIF", 
+            "masterKey": "BIob0S1uCAiRwKGf3OHVgClDk8ozxyNL0TT04KE2"
+        }, 
+        "_default": {
+            "link": "LocationHUD"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.3.3"
+    }
+}

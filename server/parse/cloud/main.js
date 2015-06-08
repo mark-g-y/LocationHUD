@@ -109,3 +109,36 @@ Parse.Cloud.define("nearby_locations", function(request, response) {
 		}
 	});
 });
+
+Parse.Cloud.define("nearby_locations_within_range", function(request, response) {
+	var query = new Parse.Query("Location");
+	var latitude = request.params.latitude;
+	var longitude = request.params.longitude;
+	var current_location = new Parse.GeoPoint(latitude, longitude);
+	query.withinKilometers("latlong", current_location, 100);
+	query.find({
+		success : function(results) {
+			var pois = [];
+			for (var i = 0; i < results.length; i++) {
+				var poi = {};
+				var result = results[i];
+				var latlong = result.get("latlong").toJSON();
+				poi["title"] = result.get("name");
+				poi["latitude"] = latlong["latitude"];
+				poi["longitude"] = latlong["longitude"];
+				poi["altitude"] = result.get("altitude");
+				poi["distance"] = current_location.kilometersTo(new Parse.GeoPoint(latlong["latitude"], latlong["longitude"]))
+				poi["count"] = result.get("count");
+				pois.push(poi);
+			}
+			pois.sort(function(a, b) {
+				return a.distance - b.distance;
+			});
+			// maybe sort by popularity, aka count
+			response.success(JSON.stringify(pois));
+		},
+		error : function() {
+			response.error("oh no!");
+		}
+	});
+});
