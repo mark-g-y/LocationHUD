@@ -214,8 +214,8 @@ public class CompassDirectionManager implements GooglePlayServicesClient.Connect
             directionHistory.clear();
             if (azimuth > 180) {
                 azimuth = azimuth - 360;
-                //Log.d("FOO", "Bearing: " + azimuth);
             }
+            //Log.d("FOO", "Bearing: " + azimuth);
             compassDirectionFoundCallback.onCompassDirectionFound(azimuth);
         }
     }

@@ -57,16 +57,16 @@ public class PoiLayout extends LinearLayout {
     public void toggleTranslucentLevel() {
         if (isNormalBackground) {
             layoutPoi.setBackgroundColor(getResources().getColor(R.color.white_more_translucent));
-            setAllTextViewColor(getResources().getColor(R.color.black_more_translucent));
+            setTextViewColor(getResources().getColor(R.color.black_more_translucent));
             isNormalBackground = false;
         } else {
             layoutPoi.setBackgroundColor(getResources().getColor(R.color.white_translucent));
-            setAllTextViewColor(getResources().getColor(android.R.color.black));
+            setTextViewColor(getResources().getColor(android.R.color.black));
             isNormalBackground = true;
         }
     }
 
-    public void setAllTextViewColor(int color) {
+    public void setTextViewColor(int color) {
         TextView titleTextView = (TextView)findViewById(R.id.title_view);
         titleTextView.setTextColor(color);
         TextView locationTextView = (TextView)findViewById(R.id.location_view);
