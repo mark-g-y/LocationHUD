@@ -10,31 +10,33 @@
   # timeout: 5000
   
 development:
-  adapter: mysql2
+  adapter: postgresql
   encoding: utf8
   database: locationhud
-  username: root
+  username: postgresql
   password: 
   host: localhost
-  port: 3306
+  port: 5432
   
 test:
-  adapter: mysql2
+  adapter: postgresql
   encoding: utf8
   database: locationhud
-  username: root
+  username: postgresql
   password: 
-  host: 127.0.0.1
-  port: 3306
+  host: localhost
+  port: 5432
   
 production:
-  adapter: mysql2
+  adapter: postgresql
   encoding: utf8
-  database: locationhud
-  username: root
+  database: 
+  username: 
   password: 
-  host: 127.0.0.1
-  port: 3306
+  host: 
+  port: 5432
+
+
 
 # development:
   # <<: *default
